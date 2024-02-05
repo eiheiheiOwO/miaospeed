@@ -4,10 +4,22 @@ builds:
     binary: miaospeed
     ldflags:
       - -s -w -X "main.COMMIT={{.Commit}}" -X "main.BUILDCOUNT={{.Env.BUILDCOUNT}}" -X "main.BRAND={{.Env.BRAND}}" -X "main.COMPILATIONTIME={{.Env.COMPILATIONTIME}}"
-    goos:
-      - darwin
-      - linux
-      - windows
+    targets:
+      - linux_386
+      - linux_amd64_v1
+      - linux_amd64_v3
+      - linux_arm64
+      - linux_arm_7
+      - linux_s390x
+      - windows_amd64_v1
+      - windows_amd64_v3
+      - windows_386
+      - windows_arm64
+      - darwin_amd64_v1
+      - darwin_amd64_v3
+      - darwin_arm64
+    env:
+      - CGO_ENABLED=0
 #  - id: miaospeed.meta
 #    dir: .
 #    binary: miaospeed.meta
@@ -21,6 +33,17 @@ builds:
 #      pre: ./build.release.hook.pre.sh
 #      post: ./build.release.hook.post.sh
 archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    format_overrides:
+      - goos: windows
+        format: zip
   - files:
     - README.md
     - LICENSE
