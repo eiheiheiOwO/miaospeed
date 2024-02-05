@@ -3,7 +3,7 @@ builds:
     dir: .
     binary: miaospeed
     ldflags:
-      - -s -w -X "main.COMMIT={{.Commit}}" -X "main.BUILDCOUNT={{.Env.BUILDCOUNT}}" -X "main.BRAND={{.Env.BRAND}}" -X "main.COMPILATIONTIME={{.Env.COMPILATIONTIME}}"
+      - -s -w"
     targets:
       - linux_386
       - linux_amd64_v1

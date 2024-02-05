@@ -5,8 +5,8 @@ on:
     # run only against tags
     branches:
       - "build"
-#    tags:
-#      - 'v*'
+    tags:
+      - 'v*'
 
 permissions:
   contents: write
