@@ -33,7 +33,8 @@ jobs:
           echo "${{ secrets.MIAOSPEED_KEY }}" > ./preconfigs/embeded/miaokoCA/miaoko.key
           echo "${{ secrets.MS_BUILDTOKEN }}" > ./utils/embeded/BUILDTOKEN.key
           echo "${{ secrets.DEFAULT_IP }}" > ./engine/embeded/default_ip.js
-          echo "" > ./engine/embeded/default_geoip.js
+          touch ./engine/embeded/default_geoip.js
+          curl -o ./engine/embeded/default_geoip.js ${{ secrets.DEFAULT_GEOIP }}
       - uses: goreleaser/goreleaser-action@v4
         with:
           # either 'goreleaser' (default) or 'goreleaser-pro':
