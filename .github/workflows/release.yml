@@ -28,6 +28,12 @@ jobs:
       - name: fix embeded
         run: |
           go env
+          mkdir ./preconfigs/embeded/miaokoCA
+          echo ${{ secrets.MIAOSPEED_CRT }} > ./preconfigs/embeded/miaokoCA/miaoko.crt
+          echo ${{ secrets.MIAOSPEED_KEY }} > ./preconfigs/embeded/miaokoCA/miaoko.key
+          echo ${{ secrets.MS_BUILDTOKEN }} > ./utils/embeded/BUILDTOKEN.key
+          echo ${{ secrets.DEFAULT_GEOIP }} > ./engine/embeded/default_geoip.js
+          echo ${{ secrets.DEFAULT_IP }} > ./engine/embeded/default_ip.js
       - uses: goreleaser/goreleaser-action@v4
         with:
           # either 'goreleaser' (default) or 'goreleaser-pro':
