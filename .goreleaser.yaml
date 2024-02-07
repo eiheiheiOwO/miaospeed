@@ -4,6 +4,8 @@ builds:
     binary: miaospeed
     ldflags:
       - -s -w
+    tags:
+      - with_gvisor
     goos:
       - linux
       - windows
