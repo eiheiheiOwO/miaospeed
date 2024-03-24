@@ -23,8 +23,9 @@ type TestingPollItem struct {
 	macros   []interfaces.SlaveRequestMacroType
 	results  *structs.AsyncArr[interfaces.SlaveEntrySlot]
 
-	onProcess func(self *TestingPollItem, idx int, result interfaces.SlaveEntrySlot)
-	onExit    func(self *TestingPollItem, exitCode taskpoll.TaskPollExitCode)
+	onProcess  func(self *TestingPollItem, idx int, result interfaces.SlaveEntrySlot)
+	onExit     func(self *TestingPollItem, exitCode taskpoll.TaskPollExitCode)
+	calcWeight func(self *TestingPollItem) uint
 
 	onProcessLock sync.Mutex
 	exitOnce      sync.Once
@@ -41,7 +42,9 @@ func (tpi *TestingPollItem) TaskName() string {
 func (tpi *TestingPollItem) Weight() uint {
 	// TODO: could arrange weight based on task size
 	// or customized rules
-
+	if tpi.calcWeight != nil {
+		return tpi.calcWeight(tpi)
+	}
 	return 1
 }
 

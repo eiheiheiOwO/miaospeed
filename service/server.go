@@ -140,6 +140,23 @@ func InitServer() {
 							},
 						})
 					},
+					// 计算权重
+					calcWeight: func(self *TestingPollItem) uint {
+						if poll.Name() == "SpeedPoll" {
+							nodeNum := len(self.request.Nodes)
+							if nodeNum <= 2 {
+								return 10
+							} else if nodeNum > 2 && nodeNum <= 10 {
+								return 7
+							} else if nodeNum > 10 && nodeNum <= 20 {
+								return 4
+							} else {
+								return 1
+							}
+						} else {
+							return 1
+						}
+					},
 				}).Init())
 
 				batches.Set(item.ID(), true)
