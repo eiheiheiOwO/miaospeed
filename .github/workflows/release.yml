@@ -33,7 +33,7 @@ jobs:
           echo "${{ secrets.DEFAULT_IP }}" > ./engine/embeded/default_ip.js
           echo "" > ./engine/embeded/default_geoip.js
           curl -o ./engine/embeded/default_geoip.js ${{ secrets.DEFAULT_GEOIP }}
-          ls -l ./engine/embeded/
+          head -n 5 ./engine/embeded/default_geoip.js
       - uses: goreleaser/goreleaser-action@v4
         with:
           # either 'goreleaser' (default) or 'goreleaser-pro':
