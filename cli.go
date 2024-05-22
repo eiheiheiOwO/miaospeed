@@ -11,6 +11,8 @@ import (
 
 var cmdName string = "miaospeed"
 
+const logo string = " __  __ _            ____                      _ \n|  \\/  (_) __ _  ___/ ___| _ __   ___  ___  __| |\n| |\\/| | |/ _` |/ _ \\___ \\| '_ \\ / _ \\/ _ \\/ _` |\n| |  | | | (_| | (_) |__) | |_) |  __/  __/ (_| |\n|_|  |_|_|\\__,_|\\___/____/| .__/ \\___|\\___|\\__,_|\n                          |_|                    "
+
 type SubCliType string
 
 const (
@@ -45,7 +47,10 @@ func RunCliDefault() {
 	sflag.Parse(os.Args[1:])
 
 	if *versionOnly {
-		fmt.Println(utils.VERSION)
+		fmt.Println(logo)
+		fmt.Printf("version: %s\n", utils.VERSION)
+		fmt.Printf("commit: %s\n", utils.COMMIT)
+		fmt.Printf("compilation time: %s\n", utils.COMPILATIONTIME)
 		os.Exit(0)
 	}
 
@@ -59,7 +64,8 @@ func RunCliDefault() {
 	fmt.Printf("        run a temporary script test to test the correctness of your script.\n")
 	fmt.Printf("  misc\n")
 	fmt.Printf("        other utility toolkit provided by miaospeed.\n")
-
+	fmt.Printf("Run this command to see the usage of the server option: \n")
+	fmt.Printf("  %s server -help\n", cmdName)
 	os.Exit(0)
 }
 

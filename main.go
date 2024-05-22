@@ -16,6 +16,5 @@ func main() {
 	utils.COMMIT = COMMIT
 	utils.BRAND = BRAND
 	utils.VERSION = VERSION
-
 	RunCli()
 }
