@@ -30,9 +30,10 @@ function handler_ipleak(ip) {
 }
 
 function handler(ip) {
-    let result = handler_ipleak(ip)
+    let result = {};
+    result = handler_ipleak(ip)
     if (result && result.ip){
         return result;
     }
-    return {};
+    return result;
 }
