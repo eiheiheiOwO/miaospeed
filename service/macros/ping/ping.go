@@ -82,6 +82,10 @@ func pingViaTrace(ctx context.Context, p interfaces.Vendor, url string) (uint16,
 			return uint16(writeEnd - tlsEnd), uint16(writeEnd - connStart), nil
 			// return uint16(tlsEnd - tlsStart), uint16(writeEnd - connStart), nil
 		}
+		// https rtt is also avalible
+		if writeEnd != 0 {
+			return 0, uint16(writeEnd - connStart), nil
+		}
 		return 0, 0, fmt.Errorf("cannot extract payload from response")
 	}
 }
