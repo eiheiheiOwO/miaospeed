@@ -10,10 +10,20 @@
 
 ## 基本使用方式
 
-### 二进制
+### 预编译二进制
 
-关于二进制的使用，本 _README_ 不做赘述，请手动编译或下载预编译文件后执行 `./miaospeed` 查看。
-
+* 帮助信息
+```shell
+./miaospeed 
+```
+* 查看版本
+```shell
+./miaospeed -version
+```
+* 查看websocket服务帮助
+```shell
+./miaospeed server -help
+```
 ### 编译
 
 由于 miaospeed 中含有部分证书与脚本并未开源，您需要补齐以下文件以成功编译:
@@ -23,8 +33,8 @@
 3. `./preconfigs/embeded/miaokoCA/miaoko.key`: 同上，这是私钥。(对于这两个您可以自己用 openssl 签一个证书，但它不能用于 miaoko。)
 4. `./preconfigs/embeded/ca-certificates.crt`: miaospeed 自带的根证书集，防止有恶意用户修改系统更证书以作假 TLS RTT。（对于 debian 用户，您可以在安装 `ca-certificates` 包后，在 `/etc/ssl/certs/ca-certificates.crt` 获取这个文件）
 5. `./engine/embeded/predefined.js`: 这个文件定义了 `JavaScript` (流媒体)脚本中一些通用方法，例如 `get()`, `safeStringify()`, `safeParse()`, `println()`，您可以自己实现它们，或者只是新建一个空文件。
-6. `./engine/embeded/default_geoip.js`: 默认的 `geoip` 脚本，需要提供一个 `handler()` 入口函数。如果您不想提供默认的 `geoip` 脚本，则可以直接新建空文件（或者您可以直接拷贝 miaoko 提供的 `geoip` 脚本）。
-7. `./engine/embeded/default_ip.js`: 默认的 `ip_resolve` 脚本，需要提供一个 `ip_resolve_default()` 入口函数，用于获取入口、出口的 IP。如果您不想提供默认的 `ip_resolve` 脚本，则可以直接新建空文件（或者您可以直接拷贝 miaoko 提供的 `geoip` 脚本里的 ip_resolve 函数）。
+6. `./engine/embeded/default_geoip.js`: 默认的 `geoip` 脚本，需要提供一个 `handler()` 入口函数。默认ip脚本已提供，您也可以自行修改。
+7. `./engine/embeded/default_ip.js`: 默认的 `ip_resolve` 脚本，需要提供一个 `ip_resolve_default()` 入口函数，用于获取入口、出口的 IP。默认geoip脚本已提供，您也可以自行修改。
 
 当您新建好以上文件后，就可以运行 `go build .` 构建 `miaospeed` 了。
 
