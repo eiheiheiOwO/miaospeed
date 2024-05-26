@@ -1,3 +1,4 @@
+const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36"
 function handler_ipleak(ip) {
     const isv6 = ip.includes(":")
     let geoip_api = `https://ipv4.ipleak.net/json/${ip}`
