@@ -11,6 +11,7 @@ BITS=$(getconf LONG_BIT)
 # 使用 readelf 获取 ELF 标头信息
 if [ "$ARCH" = "armv7l" ]; then
   ARM_VERSION=$(readelf -A /proc/self/exe | grep Tag_CPU_arch: | awk '{print $2}')
+  echo "ARM版本: $ARM_VERSION"
 fi
 
 # 获取最新的标签名称
