@@ -2,7 +2,7 @@ FROM alpine:latest
 
 ENV TZ=Asia/Shanghai
 
-COPY install.sh /tmp
+COPY docker/install.sh /tmp
 
 RUN apk add --no-cache \
     binutils wget curl && \

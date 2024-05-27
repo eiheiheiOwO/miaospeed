@@ -26,7 +26,7 @@ elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then
   wget -O /opt/miaospeed.gz https://github.com/AirportR/miaospeed/releases/download/"$LATEST_TAG"/miaospeed-linux-arm64-"$LATEST_TAG".gz
   gzip -d /opt/miaospeed.gz
   chmod +x /opt/miaospeed
-elif [ "$ARCH" = "armv7l" ] && [ "$ARM_VERSION" = "v6" ]; then
+elif [ "$ARCH" = "armv7l" ] && [ "$ARM_VERSION" = "v6KZ" ]; then
   echo "架构: linux/arm/v6"
   wget -O /opt/miaospeed.gz https://github.com/AirportR/miaospeed/releases/download/"$LATEST_TAG"/miaospeed-linux-armv6-"$LATEST_TAG".gz
   gzip -d /opt/miaospeed.gz
