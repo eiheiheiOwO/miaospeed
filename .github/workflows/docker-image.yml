@@ -33,7 +33,7 @@ jobs:
           file: ./docker/Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/miaospeed:latest
-          platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
+          platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64/v8
 
       - name: Logout from Docker Hub
         run: docker logout
