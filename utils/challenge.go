@@ -38,7 +38,8 @@ func SignRequest(token string, req *interfaces.SlaveRequest) string {
 	awaitSigned := req.Clone()
 	awaitSigned.Challenge = ""
 	if awaitSigned.RandomSequence == "" {
-		awaitSigned.Configs.Scripts = make([]interfaces.Script, 0) // 这个地方为FullTClash独家修改，因为json反序列化很容易将主端发送过来的数据改动，所以只好置为空
+		DWarn("MiaoServer compatibility deprecation: this change will be deprecated in future versions. Please upgrade your client version.")
+		awaitSigned.Configs.Scripts = make([]interfaces.Script, 0) // fulltclash Premium兼容性修改，fulltclash即将弃用
 		awaitSigned.Nodes = make([]interfaces.SlaveRequestNode, 0) // 同上
 	}
 	awaitSignedStr, _ := jsoniter.MarshalToString(&awaitSigned) //序列化

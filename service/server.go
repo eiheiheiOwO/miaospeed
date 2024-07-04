@@ -1,6 +1,8 @@
 package service
 
 import (
+	jsoniter "github.com/json-iterator/go"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -62,7 +64,18 @@ func InitServer() {
 			defer cancel()
 			for {
 				sr := interfaces.SlaveRequest{}
-				err := conn.ReadJSON(&sr)
+				_, r, err := conn.NextReader()
+				if err == nil {
+					// 新
+					err = jsoniter.NewDecoder(r).Decode(&sr)
+					// 原方案
+					//err = json.NewDecoder(r).Decode(&sr)
+					if err == io.EOF {
+						// One value is expected in the message.
+						err = io.ErrUnexpectedEOF
+					}
+				}
+
 				if err != nil {
 					if !strings.Contains(err.Error(), "EOF") && !strings.Contains(err.Error(), "reset by peer") {
 						utils.DErrorf("MiaoServer Test | Task receiving error, error=%s", err.Error())
@@ -70,7 +83,6 @@ func InitServer() {
 
 					return
 				}
-
 				verified := utils.GCFG.VerifyRequest(&sr)
 				utils.DLogf("MiaoServer Test | Receive Task, name=%s invoker=%v matrices=%v payload=%d verify=%v", sr.Basics.ID, sr.Basics.Invoker, sr.Options.Matrices, len(sr.Nodes), verified)
 
