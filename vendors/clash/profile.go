@@ -1,8 +1,8 @@
 package clash
 
 import (
-	"github.com/Dreamacro/clash/adapter"
-	"github.com/Dreamacro/clash/constant"
+	"github.com/metacubex/mihomo/adapter"
+	"github.com/metacubex/mihomo/constant"
 	"github.com/miaokobot/miaospeed/interfaces"
 	"github.com/miaokobot/miaospeed/utils"
 	"gopkg.in/yaml.v2"

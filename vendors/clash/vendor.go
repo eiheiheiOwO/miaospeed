@@ -5,7 +5,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/Dreamacro/clash/constant"
+	"github.com/metacubex/mihomo/component/resolver"
+	"github.com/metacubex/mihomo/constant"
 	"github.com/miaokobot/miaospeed/interfaces"
 )
 
@@ -42,6 +43,9 @@ func (c *Clash) DialTCP(ctx context.Context, url string, network interfaces.Requ
 	if err != nil {
 		return nil, fmt.Errorf("cannot build tcp context")
 	}
+	if resolver.DisableIPv6 {
+		resolver.DisableIPv6 = false
+	}
 	conn, err := c.proxy.DialContext(ctx, &addr)
 	return conn, err
 }
@@ -55,7 +59,9 @@ func (c *Clash) DialUDP(ctx context.Context, url string) (net.PacketConn, error)
 	if err != nil {
 		return nil, fmt.Errorf("cannot build udp context")
 	}
-
+	if resolver.DisableIPv6 {
+		resolver.DisableIPv6 = false
+	}
 	return c.proxy.DialUDP(&addr)
 
 }
