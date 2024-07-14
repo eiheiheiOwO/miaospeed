@@ -3,14 +3,14 @@ function handler_ipleak(ip) {
     const isv6 = ip.includes(":")
     let geoip_api = `https://ipv4.ipleak.net/json/${ip}`
     if (isv6){
-        geoip_api = `https://ipv6.ipleak.net/json/${ip}`
+        geoip_api = `https://ipv4.ipleak.net/json/${ip}`
     }
     const content = fetch(geoip_api, {
         headers: {
             'User-Agent': UA,
         },
-        retry: 3,
-        timeout: 5000,
+        retry: 1,
+        timeout: 3000,
     });
     const ret = safeParse(get(content, "body"));
     return {
