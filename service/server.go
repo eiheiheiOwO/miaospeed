@@ -156,14 +156,11 @@ func InitServer() {
 					calcWeight: func(self *TestingPollItem) uint {
 						if poll.Name() == "SpeedPoll" {
 							nodeNum := len(self.request.Nodes)
-							if nodeNum <= 2 {
-								return 10
-							} else if nodeNum > 2 && nodeNum <= 10 {
-								return 7
-							} else if nodeNum > 10 && nodeNum <= 20 {
-								return 4
-							} else {
+							w := nodeNum / 10
+							if w == 0 {
 								return 1
+							} else {
+								return uint(w)
 							}
 						} else {
 							return 1
