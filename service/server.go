@@ -154,17 +154,18 @@ func InitServer() {
 					},
 					// 计算权重
 					calcWeight: func(self *TestingPollItem) uint {
-						if poll.Name() == "SpeedPoll" {
-							nodeNum := len(self.request.Nodes)
-							w := nodeNum / 10
-							if w == 0 {
-								return 1
-							} else {
-								return uint(w)
-							}
-						} else {
-							return 1
-						}
+						return 1
+						//if poll.Name() == "SpeedPoll" {
+						//	nodeNum := len(self.request.Nodes)
+						//	w := nodeNum / 10
+						//	if w == 0 {
+						//		return 1
+						//	} else {
+						//		return uint(w)
+						//	}
+						//} else {
+						//	return 1
+						//}
 					},
 				}).Init())
 
