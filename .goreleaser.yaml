@@ -1,3 +1,6 @@
+before:
+  hooks:
+    - go run . misc -maxmind-update-license {{.Env.MAXMIND_LICENSE_KEY}}
 builds:
   - id: miaospeed
     dir: .
@@ -32,7 +35,8 @@ builds:
 #      pre: ./build.release.hook.pre.sh
 #      post: ./build.release.hook.post.sh
 archives:
-  - format: tar.gz
+  - id: default
+    format: tar.gz
     name_template: '{{ .ProjectName }}-{{ .Os }}-{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}'
     format_overrides:
       - goos: windows
@@ -40,6 +44,16 @@ archives:
     files:
       - README.md
       - LICENSE
+  - id: with-mmdb
+    format: tar.gz
+    name_template: '{{ .ProjectName }}-geodb-{{ .Os }}-{{ .Arch }}{{ with .Arm }}v{{ . }}{{ end }}{{ with .Mips }}_{{ . }}{{ end }}{{ if not (eq .Amd64 "v1") }}{{ .Amd64 }}{{ end }}'
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE
+      - "*.mmdb"
 release:
   github:
     owner: AirportR
