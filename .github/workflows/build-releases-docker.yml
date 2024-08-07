@@ -18,6 +18,16 @@ jobs:
       - name: Get the tag
         run: echo "The tag is ${{ github.ref_name }}"
 
+      - name: fix embeded
+        run: |
+          go env
+          mkdir ./preconfigs/embeded/miaokoCA
+          echo "${{ secrets.MIAOSPEED_CRT }}" > ./preconfigs/embeded/miaokoCA/miaoko.crt
+          echo "${{ secrets.MIAOSPEED_KEY }}" > ./preconfigs/embeded/miaokoCA/miaoko.key
+          echo "${{ secrets.MS_BUILDTOKEN }}" > ./utils/embeded/BUILDTOKEN.key
+          curl -o ./engine/embeded/default_geoip.js ${{ secrets.DEFAULT_GEOIP }}
+          head -n 5 ./engine/embeded/default_geoip.js
+
       - name: build
         run: make releases
 
