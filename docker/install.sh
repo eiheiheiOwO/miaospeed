@@ -27,4 +27,5 @@ fi
 
 curl -L "https://github.com/AirportR/miaospeed/releases/download/$LATEST_TAG/miaospeed-$ARCH-$LATEST_TAG.tar.gz" -o "/opt/miaospeed.tar.gz"
 tar -xzf /opt/miaospeed.tar.gz
+mv /opt/miaospeed-$ARCH-"$LATEST_TAG" /opt/miaospeed
 chmod +x /opt/miaospeed
