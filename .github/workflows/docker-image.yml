@@ -15,6 +15,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Get the tag
+        run: echo "The tag is ${{ github.ref_name }}"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -33,7 +36,9 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/miaospeed:latest
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/miaospeed:latest
+#            ${{ secrets.DOCKERHUB_USERNAME }}/miaospeed:${{ github.ref_name }}
           platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64/v8
 
       - name: Logout from Docker Hub
