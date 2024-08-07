@@ -15,7 +15,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Get the tag
-        run: echo "The tag is ${{ github.ref_name }}"
+        run: | 
+          echo "MIAOSPEED_TAG=$(curl -s https://api.github.com/repos/AirportR/miaospeed/releases/latest | grep 'tag_name' | cut -d '"' -f 4)" >> $GITHUB_ENV
+          echo "The tag is ${{ github.ref_name }}"
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -37,7 +39,7 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/miaospeed:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/miaospeed:${{ github.ref_name }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/miaospeed:${{ env.MIAOSPEED_TAG }}
           platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64/v8
 
       - name: Logout from Docker Hub
