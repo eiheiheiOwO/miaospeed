@@ -18,6 +18,16 @@ jobs:
       - name: Get the tag
         run: echo "The tag is ${{ github.ref_name }}"
 
+      - name: build
+        run: make releases
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./bin/*
+          body_path: './CHANGELOG.md'
+          tag_name: ${{ github.ref_name }}
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -38,7 +48,7 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/miaospeed:latest
-#            ${{ secrets.DOCKERHUB_USERNAME }}/miaospeed:${{ github.ref_name }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/miaospeed:${{ github.ref_name }}
           platforms: linux/386,linux/amd64,linux/arm/v7,linux/arm64/v8
 
       - name: Logout from Docker Hub

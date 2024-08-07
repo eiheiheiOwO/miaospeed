@@ -14,6 +14,10 @@ type Clash struct {
 	proxy constant.Proxy
 }
 
+func (c *Clash) Proxy() constant.Proxy {
+	return c.proxy
+}
+
 func (c *Clash) Type() interfaces.VendorType {
 	return interfaces.VendorClash
 }

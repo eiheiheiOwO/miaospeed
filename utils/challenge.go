@@ -34,10 +34,10 @@ func hashMiaoSpeed(token, request string) string {
 //	return hex.EncodeToString(hasher.Sum(nil))
 //}
 
-func SignRequest(token string, req *interfaces.SlaveRequest) string {
+func SignRequestOld(token string, req *interfaces.SlaveRequestV1) string {
 	awaitSigned := req.Clone()
 	awaitSigned.Challenge = ""
-	if awaitSigned.RandomSequence == "" {
+	if req.RandomSequence == "" {
 		DWarn("MiaoServer compatibility deprecation: this change will be deprecated in future versions. Please upgrade your client version.")
 		awaitSigned.Configs.Scripts = make([]interfaces.Script, 0) // fulltclash Premium兼容性修改，fulltclash即将弃用
 		awaitSigned.Nodes = make([]interfaces.SlaveRequestNode, 0) // 同上
@@ -45,4 +45,15 @@ func SignRequest(token string, req *interfaces.SlaveRequest) string {
 	awaitSignedStr, _ := jsoniter.MarshalToString(&awaitSigned) //序列化
 	awaitSignedStr = strings.TrimSpace(awaitSignedStr)          //去除多余空格
 	return hashMiaoSpeed(token, awaitSignedStr)
+}
+func SignRequest(token string, req *interfaces.SlaveRequest) string {
+	if req.Configs.ApiVersion == interfaces.ApiV0 || req.Configs.ApiVersion == interfaces.ApiV1 {
+		return SignRequestOld(token, req.CloneToV1())
+	} else {
+		awaitSigned := req.Clone()
+		awaitSigned.Challenge = ""
+		awaitSignedStr, _ := jsoniter.MarshalToString(&awaitSigned)
+		awaitSignedStr = strings.TrimSpace(awaitSignedStr)
+		return hashMiaoSpeed(token, awaitSignedStr)
+	}
 }

@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"context"
+	"github.com/metacubex/mihomo/constant"
 	"net"
 )
 
@@ -42,4 +43,7 @@ type Vendor interface {
 
 	// return universal proxy info
 	ProxyInfo() ProxyInfo
+
+	// raw proxt constant
+	Proxy() constant.Proxy
 }

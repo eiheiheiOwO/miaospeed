@@ -3,6 +3,7 @@ package local
 import (
 	"context"
 	"fmt"
+	"github.com/metacubex/mihomo/constant"
 	"net"
 
 	"github.com/miaokobot/miaospeed/interfaces"
@@ -11,6 +12,10 @@ import (
 type Local struct {
 	name string
 	info string
+}
+
+func (c *Local) Proxy() constant.Proxy {
+	return nil
 }
 
 func (c *Local) Type() interfaces.VendorType {
@@ -27,7 +32,7 @@ func (c *Local) Build(proxyName string, proxyInfo string) interfaces.Vendor {
 	return c
 }
 
-func (c *Local) DialTCP(ctx context.Context, url string, network interfaces.RequestOptionsNetwork) (net.Conn, error) {
+func (c *Local) DialTCP(_ context.Context, url string, network interfaces.RequestOptionsNetwork) (net.Conn, error) {
 	if hostname, port, err := urlToMetadata(url); err != nil {
 		return nil, err
 	} else {
@@ -35,7 +40,7 @@ func (c *Local) DialTCP(ctx context.Context, url string, network interfaces.Requ
 	}
 }
 
-func (c *Local) DialUDP(ctx context.Context, url string) (net.PacketConn, error) {
+func (c *Local) DialUDP(_ context.Context, _ string) (net.PacketConn, error) {
 	return nil, fmt.Errorf("local test does not support udp yet")
 
 }

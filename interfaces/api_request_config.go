@@ -5,7 +5,7 @@ import (
 	"github.com/miaokobot/miaospeed/utils/structs"
 )
 
-type SlaveRequestConfigs struct {
+type SlaveRequestConfigsV1 struct {
 	STUNURL           string `yaml:"stunURL,omitempty" cf:"name=🫙 STUN 地址"`
 	DownloadURL       string `yaml:"downloadURL,omitempty" cf:"name=📃 测速文件"`
 	DownloadDuration  int64  `yaml:"downloadDuration,omitempty" cf:"name=⏱️ 测速时长 (单位: 秒)"`
@@ -21,7 +21,45 @@ type SlaveRequestConfigs struct {
 	Scripts     []Script `yaml:"-" fw:"readonly"`
 }
 
-func (src *SlaveRequestConfigs) DescriptionText() string {
+const (
+	ApiV0 = iota
+	ApiV1 = iota
+	//ApiV2 = iota
+)
+
+type SlaveRequestConfigsV2 struct {
+	*SlaveRequestConfigsV1
+	ApiVersion   int  `yaml:"apiVersion,omitempty" cf:"name=🧬API版本，用于兼容Miaoko"`
+	UseClashPing bool `yaml:"useClashPing,omitempty" cf:"name=🐱使用Clash内置延迟测试"`
+}
+
+func (srcv2 *SlaveRequestConfigsV2) Clone() *SlaveRequestConfigsV2 {
+	return &SlaveRequestConfigsV2{
+		SlaveRequestConfigsV1: srcv2.SlaveRequestConfigsV1.Clone(),
+		ApiVersion:            srcv2.ApiVersion,
+		UseClashPing:          srcv2.UseClashPing,
+	}
+}
+
+func (srcv2 *SlaveRequestConfigsV2) CloneToV1() *SlaveRequestConfigsV1 {
+	return &SlaveRequestConfigsV1{
+		STUNURL:           srcv2.STUNURL,
+		DownloadURL:       srcv2.DownloadURL,
+		DownloadDuration:  srcv2.DownloadDuration,
+		DownloadThreading: srcv2.DownloadThreading,
+
+		PingAverageOver: srcv2.PingAverageOver,
+		PingAddress:     srcv2.PingAddress,
+
+		TaskRetry:  srcv2.TaskRetry,
+		DNSServers: cloneSlice(srcv2.DNSServers),
+
+		TaskTimeout: srcv2.TaskTimeout,
+		Scripts:     srcv2.Scripts,
+	}
+}
+
+func (src *SlaveRequestConfigsV1) DescriptionText() string {
 	hint := structs.X("案例:\ndownloadDuration: 取值范围 [1,30]\ndownloadThreading: 取值范围 [1,8]\ntaskThreading: 取值范围 [1,32]\ntaskRetry: 取值范围 [1,10]\n\n当前:\n")
 	cont := "empty"
 	if src != nil {
@@ -30,8 +68,8 @@ func (src *SlaveRequestConfigs) DescriptionText() string {
 	return hint + cont
 }
 
-func (src *SlaveRequestConfigs) Clone() *SlaveRequestConfigs {
-	return &SlaveRequestConfigs{
+func (src *SlaveRequestConfigsV1) Clone() *SlaveRequestConfigsV1 {
+	return &SlaveRequestConfigsV1{
 		STUNURL:           src.STUNURL,
 		DownloadURL:       src.DownloadURL,
 		DownloadDuration:  src.DownloadDuration,
@@ -48,7 +86,7 @@ func (src *SlaveRequestConfigs) Clone() *SlaveRequestConfigs {
 	}
 }
 
-func (src *SlaveRequestConfigs) Merge(from *SlaveRequestConfigs) *SlaveRequestConfigs {
+func (src *SlaveRequestConfigsV1) Merge(from *SlaveRequestConfigsV1) *SlaveRequestConfigsV1 {
 	ret := src.Clone()
 	if from.STUNURL != "" {
 		ret.STUNURL = from.STUNURL
@@ -89,45 +127,45 @@ func (src *SlaveRequestConfigs) Merge(from *SlaveRequestConfigs) *SlaveRequestCo
 	return ret
 }
 
-func (cfg *SlaveRequestConfigs) Check() *SlaveRequestConfigs {
-	if cfg == nil {
-		cfg = &SlaveRequestConfigs{}
+func (src *SlaveRequestConfigsV1) Check() *SlaveRequestConfigsV1 {
+	if src == nil {
+		src = &SlaveRequestConfigsV1{}
 	}
 
-	if cfg.STUNURL == "" {
-		cfg.STUNURL = preconfigs.PROXY_DEFAULT_STUN_SERVER
+	if src.STUNURL == "" {
+		src.STUNURL = preconfigs.PROXY_DEFAULT_STUN_SERVER
 	}
-	if cfg.DownloadURL == "" {
-		cfg.DownloadURL = preconfigs.SPEED_DEFAULT_LARGE_FILE_DEFAULT
+	if src.DownloadURL == "" {
+		src.DownloadURL = preconfigs.SPEED_DEFAULT_LARGE_FILE_DEFAULT
 	}
-	if cfg.DownloadDuration < 1 || cfg.DownloadDuration > 30 {
-		cfg.DownloadDuration = preconfigs.SPEED_DEFAULT_DURATION
+	if src.DownloadDuration < 1 || src.DownloadDuration > 30 {
+		src.DownloadDuration = preconfigs.SPEED_DEFAULT_DURATION
 	}
-	if cfg.DownloadThreading < 1 || cfg.DownloadThreading > 32 {
-		cfg.DownloadThreading = preconfigs.SPEED_DEFAULT_THREADING
-	}
-
-	if cfg.TaskRetry < 1 || cfg.TaskRetry > 10 {
-		cfg.TaskRetry = preconfigs.SLAVE_DEFAULT_RETRY
+	if src.DownloadThreading < 1 || src.DownloadThreading > 32 {
+		src.DownloadThreading = preconfigs.SPEED_DEFAULT_THREADING
 	}
 
-	if cfg.PingAddress == "" {
-		cfg.PingAddress = preconfigs.SLAVE_DEFAULT_PING
-	}
-	if cfg.PingAverageOver == 0 || cfg.PingAverageOver > 16 {
-		cfg.PingAverageOver = 1
+	if src.TaskRetry < 1 || src.TaskRetry > 10 {
+		src.TaskRetry = preconfigs.SLAVE_DEFAULT_RETRY
 	}
 
-	if cfg.DNSServers == nil {
-		cfg.DNSServers = make([]string, 0)
+	if src.PingAddress == "" {
+		src.PingAddress = preconfigs.SLAVE_DEFAULT_PING
+	}
+	if src.PingAverageOver == 0 || src.PingAverageOver > 16 {
+		src.PingAverageOver = 1
 	}
 
-	if cfg.TaskTimeout < 10 || cfg.TaskTimeout > 10000 {
-		cfg.TaskTimeout = preconfigs.SLAVE_DEFAULT_TIMEOUT
-	}
-	if cfg.Scripts == nil {
-		cfg.Scripts = make([]Script, 0)
+	if src.DNSServers == nil {
+		src.DNSServers = make([]string, 0)
 	}
 
-	return cfg
+	if src.TaskTimeout < 10 || src.TaskTimeout > 10000 {
+		src.TaskTimeout = preconfigs.SLAVE_DEFAULT_TIMEOUT
+	}
+	if src.Scripts == nil {
+		src.Scripts = make([]Script, 0)
+	}
+
+	return src
 }

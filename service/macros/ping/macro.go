@@ -14,6 +14,10 @@ func (m *Ping) Type() interfaces.SlaveRequestMacroType {
 }
 
 func (m *Ping) Run(proxy interfaces.Vendor, r *interfaces.SlaveRequest) error {
-	m.RTT, m.Request = ping(proxy, r.Configs.PingAddress, r.Configs.PingAverageOver, int(r.Configs.TaskRetry), r.Configs.TaskTimeout)
+	var pingFunc pingFuncType = nil
+	if r.Configs.UseClashPing {
+		pingFunc = pingViaClash
+	}
+	m.RTT, m.Request = ping(proxy, r.Configs.PingAddress, r.Configs.PingAverageOver, int(r.Configs.TaskRetry), r.Configs.TaskTimeout, pingFunc)
 	return nil
 }

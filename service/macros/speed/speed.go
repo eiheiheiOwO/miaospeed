@@ -3,7 +3,6 @@ package speed
 import (
 	"context"
 	"io"
-	"io/ioutil"
 	"strings"
 	"sync"
 	"time"
@@ -18,15 +17,15 @@ import (
 	"github.com/miaokobot/miaospeed/vendors"
 )
 
-func Once(speed *Speed, proxy interfaces.Vendor, cfg *interfaces.SlaveRequestConfigs) {
+func Once(speed *Speed, proxy interfaces.Vendor, cfg *interfaces.SlaveRequestConfigsV2) {
 	speed.Speeds = make([]uint64, cfg.DownloadDuration)
 
 	downloadFiles := RefetchDownloadFiles(proxy, cfg.DownloadURL)
 	utils.DLogf("Speed Prefetch | Using files arr=%v", downloadFiles)
 
 	th := int(cfg.DownloadThreading)
-	wcGroups := []*WriteCounter{}
-	ctxCancels := []context.CancelFunc{}
+	var wcGroups []*WriteCounter
+	var ctxCancels []context.CancelFunc
 
 	initWG := sync.WaitGroup{}
 	writingLock := sync.Mutex{}
@@ -112,11 +111,12 @@ func SingleThread(downloadFiles []string, proxy interfaces.Vendor, timeoutSecond
 				} else {
 					bodyReader = resp.Body
 				}
-				io.Copy(ioutil.Discard, io.TeeReader(bodyReader, wc))
+
+				_, _ = io.Copy(io.Discard, io.TeeReader(bodyReader, wc))
 			}
 			// close body
 			if resp != nil && resp.Body != nil {
-				resp.Body.Close()
+				_ = resp.Body.Close()
 			}
 		}
 	}()
