@@ -1,11 +1,11 @@
 package vendors
 
 import (
-	"github.com/miaokobot/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/interfaces"
 
-	"github.com/miaokobot/miaospeed/vendors/clash"
-	"github.com/miaokobot/miaospeed/vendors/invalid"
-	"github.com/miaokobot/miaospeed/vendors/local"
+	"github.com/airportr/miaospeed/vendors/clash"
+	"github.com/airportr/miaospeed/vendors/invalid"
+	"github.com/airportr/miaospeed/vendors/local"
 )
 
 var registeredList = map[interfaces.VendorType]func() interfaces.Vendor{

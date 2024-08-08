@@ -1,10 +1,10 @@
 package factory
 
 import (
+	"github.com/airportr/miaospeed/engine/helpers"
+	"github.com/airportr/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/vendors"
 	"github.com/dop251/goja"
-	"github.com/miaokobot/miaospeed/engine/helpers"
-	"github.com/miaokobot/miaospeed/interfaces"
-	"github.com/miaokobot/miaospeed/vendors"
 )
 
 func NetCatFactory(vm *goja.Runtime, p interfaces.Vendor, network interfaces.RequestOptionsNetwork) func(call goja.FunctionCall) goja.Value {

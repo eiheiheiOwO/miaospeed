@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/miaokobot/miaospeed/utils"
+	"github.com/airportr/miaospeed/utils"
 )
 
 var COMPILATIONTIME string

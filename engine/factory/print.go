@@ -3,8 +3,8 @@ package factory
 import (
 	"fmt"
 
+	"github.com/airportr/miaospeed/utils"
 	"github.com/dop251/goja"
-	"github.com/miaokobot/miaospeed/utils"
 )
 
 func PrintFactory(vm *goja.Runtime, prefix string, logType utils.LogType) func(call goja.FunctionCall) goja.Value {

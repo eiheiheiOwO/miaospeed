@@ -5,8 +5,8 @@ import (
 	"encoding/base64"
 	"strings"
 
+	"github.com/airportr/miaospeed/interfaces"
 	jsoniter "github.com/json-iterator/go"
-	"github.com/miaokobot/miaospeed/interfaces"
 )
 
 // aws-v4-signature-like signing method

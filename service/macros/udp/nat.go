@@ -5,7 +5,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/miaokobot/miaospeed/utils"
+	"github.com/airportr/miaospeed/utils"
 	"github.com/pion/stun"
 )
 

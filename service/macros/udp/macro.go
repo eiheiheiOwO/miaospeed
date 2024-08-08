@@ -3,8 +3,8 @@ package udp
 import (
 	"strings"
 
-	"github.com/miaokobot/miaospeed/interfaces"
-	"github.com/miaokobot/miaospeed/preconfigs"
+	"github.com/airportr/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/preconfigs"
 )
 
 type Udp struct {

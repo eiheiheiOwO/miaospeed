@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/miaokobot/miaospeed/utils"
-	"github.com/miaokobot/miaospeed/utils/structs"
+	"github.com/airportr/miaospeed/utils"
+	"github.com/airportr/miaospeed/utils/structs"
 )
 
 type TaskPollExitCode uint

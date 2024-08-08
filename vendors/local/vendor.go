@@ -6,7 +6,7 @@ import (
 	"github.com/metacubex/mihomo/constant"
 	"net"
 
-	"github.com/miaokobot/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/interfaces"
 )
 
 type Local struct {
