@@ -1,19 +1,19 @@
 package matrices
 
 import (
-	"github.com/miaokobot/miaospeed/interfaces"
-	"github.com/miaokobot/miaospeed/utils/structs"
+	"github.com/AiportR/miaospeed/interfaces"
+	"github.com/AiportR/miaospeed/utils/structs"
 
-	"github.com/miaokobot/miaospeed/service/matrices/averagespeed"
-	"github.com/miaokobot/miaospeed/service/matrices/httpping"
-	"github.com/miaokobot/miaospeed/service/matrices/inboundgeoip"
-	"github.com/miaokobot/miaospeed/service/matrices/invalid"
-	"github.com/miaokobot/miaospeed/service/matrices/maxspeed"
-	"github.com/miaokobot/miaospeed/service/matrices/outboundgeoip"
-	"github.com/miaokobot/miaospeed/service/matrices/persecondspeed"
-	"github.com/miaokobot/miaospeed/service/matrices/rttping"
-	"github.com/miaokobot/miaospeed/service/matrices/scripttest"
-	"github.com/miaokobot/miaospeed/service/matrices/udptype"
+	"github.com/AiportR/miaospeed/service/matrices/averagespeed"
+	"github.com/AiportR/miaospeed/service/matrices/httpping"
+	"github.com/AiportR/miaospeed/service/matrices/inboundgeoip"
+	"github.com/AiportR/miaospeed/service/matrices/invalid"
+	"github.com/AiportR/miaospeed/service/matrices/maxspeed"
+	"github.com/AiportR/miaospeed/service/matrices/outboundgeoip"
+	"github.com/AiportR/miaospeed/service/matrices/persecondspeed"
+	"github.com/AiportR/miaospeed/service/matrices/rttping"
+	"github.com/AiportR/miaospeed/service/matrices/scripttest"
+	"github.com/AiportR/miaospeed/service/matrices/udptype"
 )
 
 var registeredList = map[interfaces.SlaveRequestMatrixType]func() interfaces.SlaveRequestMatrix{

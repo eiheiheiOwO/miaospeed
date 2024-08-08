@@ -10,11 +10,11 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/juju/ratelimit"
 
-	"github.com/miaokobot/miaospeed/interfaces"
-	"github.com/miaokobot/miaospeed/preconfigs"
-	"github.com/miaokobot/miaospeed/utils"
-	"github.com/miaokobot/miaospeed/utils/structs"
-	"github.com/miaokobot/miaospeed/vendors"
+	"github.com/AiportR/miaospeed/interfaces"
+	"github.com/AiportR/miaospeed/preconfigs"
+	"github.com/AiportR/miaospeed/utils"
+	"github.com/AiportR/miaospeed/utils/structs"
+	"github.com/AiportR/miaospeed/vendors"
 )
 
 func Once(speed *Speed, proxy interfaces.Vendor, cfg *interfaces.SlaveRequestConfigsV2) {

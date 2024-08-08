@@ -13,10 +13,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/miaokobot/miaospeed/interfaces"
-	"github.com/miaokobot/miaospeed/preconfigs"
-	"github.com/miaokobot/miaospeed/utils"
-	"github.com/miaokobot/miaospeed/utils/structs"
+	"github.com/AiportR/miaospeed/interfaces"
+	"github.com/AiportR/miaospeed/preconfigs"
+	"github.com/AiportR/miaospeed/utils"
+	"github.com/AiportR/miaospeed/utils/structs"
 )
 
 type pingFuncType func(ctx context.Context, p interfaces.Vendor, url string) (uint16, uint16, error)

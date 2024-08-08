@@ -4,10 +4,10 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/AiportR/miaospeed/engine"
+	"github.com/AiportR/miaospeed/engine/helpers"
+	"github.com/AiportR/miaospeed/interfaces"
 	"github.com/dop251/goja"
-	"github.com/miaokobot/miaospeed/engine"
-	"github.com/miaokobot/miaospeed/engine/helpers"
-	"github.com/miaokobot/miaospeed/interfaces"
 )
 
 func ExecScript(p interfaces.Vendor, script *interfaces.Script) interfaces.ScriptResult {

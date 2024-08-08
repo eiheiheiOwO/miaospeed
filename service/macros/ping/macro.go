@@ -1,7 +1,7 @@
 package ping
 
 import (
-	"github.com/miaokobot/miaospeed/interfaces"
+	"github.com/AiportR/miaospeed/interfaces"
 )
 
 type Ping struct {

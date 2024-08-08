@@ -5,7 +5,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/miaokobot/miaospeed/interfaces"
+	"github.com/AiportR/miaospeed/interfaces"
 )
 
 func detectNATType(proxy interfaces.Vendor, url string) (nmt NATMapType, nft NATFilterType) {

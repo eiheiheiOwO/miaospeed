@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"net"
 
+	"github.com/AiportR/miaospeed/interfaces"
 	"github.com/metacubex/mihomo/component/resolver"
 	"github.com/metacubex/mihomo/constant"
-	"github.com/miaokobot/miaospeed/interfaces"
 )
 
 type Clash struct {

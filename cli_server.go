@@ -5,8 +5,8 @@ import (
 	"os"
 	"strings"
 
-	"github.com/miaokobot/miaospeed/service"
-	"github.com/miaokobot/miaospeed/utils"
+	"github.com/AiportR/miaospeed/service"
+	"github.com/AiportR/miaospeed/utils"
 )
 
 func InitConfigServer() *utils.GlobalConfig {

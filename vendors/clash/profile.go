@@ -1,10 +1,10 @@
 package clash
 
 import (
+	"github.com/AiportR/miaospeed/interfaces"
+	"github.com/AiportR/miaospeed/utils"
 	"github.com/metacubex/mihomo/adapter"
 	"github.com/metacubex/mihomo/constant"
-	"github.com/miaokobot/miaospeed/interfaces"
-	"github.com/miaokobot/miaospeed/utils"
 	"gopkg.in/yaml.v2"
 )
 

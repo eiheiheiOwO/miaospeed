@@ -1,8 +1,8 @@
 package maxspeed
 
 import (
-	"github.com/miaokobot/miaospeed/interfaces"
-	"github.com/miaokobot/miaospeed/service/macros/speed"
+	"github.com/AiportR/miaospeed/interfaces"
+	"github.com/AiportR/miaospeed/service/macros/speed"
 )
 
 type MaxSpeed struct {

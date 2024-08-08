@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"github.com/miaokobot/miaospeed/interfaces"
-	"github.com/miaokobot/miaospeed/utils/structs"
+	"github.com/AiportR/miaospeed/interfaces"
+	"github.com/AiportR/miaospeed/utils/structs"
 )
 
 type GlobalConfig struct {

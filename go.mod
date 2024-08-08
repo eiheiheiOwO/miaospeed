@@ -1,4 +1,4 @@
-module github.com/miaokobot/miaospeed
+module github.com/AiportR/miaospeed
 
 go 1.20
 
@@ -10,6 +10,7 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/juju/ratelimit v1.0.2
 	github.com/metacubex/mihomo v1.18.6
+	github.com/miaokobot/miaospeed v0.0.0-20230313132009-0234a01d9daa
 	github.com/oschwald/maxminddb-golang v1.12.0
 	github.com/pion/stun v0.3.6-0.20210802014538-fa0355cc10e8
 	golang.org/x/sync v0.7.0
@@ -18,6 +19,7 @@ require (
 
 require (
 	github.com/3andne/restls-client-go v0.1.6 // indirect
+	github.com/Dreamacro/clash v1.11.4 // indirect
 	github.com/RyuaNerin/go-krypto v1.2.4 // indirect
 	github.com/Yawning/aez v0.0.0-20211027044916-e49e68abd344 // indirect
 	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da // indirect
@@ -99,6 +101,7 @@ require (
 	github.com/wk8/go-ordered-map/v2 v2.1.8 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	gitlab.com/yawning/bsaes.git v0.0.0-20190805113838-0a714cd429ec // indirect
+	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/mock v0.4.0 // indirect
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba // indirect
 	golang.org/x/crypto v0.24.0 // indirect
@@ -115,3 +118,4 @@ require (
 )
 
 //replace github.com/Dreamacro/clash => github.com/MetaCubeX/mihomo v1.18.6
+//replace github.com/miaokobot/miaospeed => github.com/AirportR/miaospeed v4.4.2
