@@ -1,6 +1,5 @@
 package ping
 
-import "C"
 import (
 	"bufio"
 	"context"
