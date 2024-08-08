@@ -1,4 +1,4 @@
-module github.com/AirportR/miaospeed
+module github.com/airportr/miaospeed
 
 go 1.20
 
