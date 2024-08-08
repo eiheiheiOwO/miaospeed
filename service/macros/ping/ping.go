@@ -1,11 +1,11 @@
 package ping
 
+import "C"
 import (
 	"bufio"
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/metacubex/mihomo/adapter"
 	"net"
 	"net/http"
 	"net/http/httptrace"
@@ -13,7 +13,6 @@ import (
 	"strings"
 	"time"
 
-	mutils "github.com/metacubex/mihomo/common/utils"
 	"github.com/miaokobot/miaospeed/interfaces"
 	"github.com/miaokobot/miaospeed/preconfigs"
 	"github.com/miaokobot/miaospeed/utils"
@@ -138,21 +137,71 @@ func pingViaNetCat(ctx context.Context, p interfaces.Vendor, url string) (uint16
 }
 func pingViaClash(ctx context.Context, p interfaces.Vendor, url string) (uint16, uint16, error) {
 	if p.Type() == interfaces.VendorClash {
-		pConstant := p.Proxy()
-		expectedStatus, err := mutils.NewUnsignedRanges[uint16]("200/204/401-429/501-503")
+
+		var rtt uint16 = 0
+		var rtt2 uint16 = 0
+
+		start := time.Now()
+		instance, err := p.DialTCP(ctx, url, interfaces.ROptionsTCP)
 		if err != nil {
 			return 0, 0, err
 		}
-		adapter.UnifiedDelay.Store(false)
-		delay, err1 := pConstant.URLTest(ctx, url, expectedStatus)
-		adapter.UnifiedDelay.Store(true)
-		delay2, err2 := pConstant.URLTest(ctx, url, expectedStatus)
-		if err1 != nil && err2 == nil {
-			return delay2, 0, err1
-		} else if err1 == nil && err2 != nil {
-			return 0, delay, err2
+		defer func() {
+			_ = instance.Close()
+		}()
+
+		req, err := http.NewRequest(http.MethodGet, url, nil)
+		if err != nil {
+			return 0, 0, err
 		}
-		return delay2, delay, nil
+		req = req.WithContext(ctx)
+
+		transport := &http.Transport{
+			DialContext: func(context.Context, string, string) (net.Conn, error) {
+				return instance, nil
+			},
+			// from http.DefaultTransport
+			MaxIdleConns:          100,
+			IdleConnTimeout:       3 * time.Second,
+			TLSHandshakeTimeout:   3 * time.Second,
+			ExpectContinueTimeout: 1 * time.Second,
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: false,
+				// for version prior to tls1.3, the handshake will take 2-RTTs,
+				// plus, majority server supports tls1.3, so we set a limit here
+				MinVersion: tls.VersionTLS13,
+				RootCAs:    preconfigs.MiaokoRootCAPrepare(),
+			},
+		}
+
+		client := http.Client{
+			Timeout:   30 * time.Second,
+			Transport: transport,
+			CheckRedirect: func(req *http.Request, via []*http.Request) error {
+				return http.ErrUseLastResponse
+			},
+		}
+
+		defer client.CloseIdleConnections()
+
+		resp, err := client.Do(req)
+
+		if err != nil {
+			rtt2 = 0
+		} else {
+			rtt2 = uint16(time.Since(start) / time.Millisecond)
+			_ = resp.Body.Close()
+		}
+		var start2 = time.Now()
+		resp, err = client.Do(req)
+		if err != nil {
+			rtt = 0
+		} else {
+			rtt = uint16(time.Since(start2) / time.Millisecond)
+			_ = resp.Body.Close()
+		}
+
+		return rtt, rtt2, nil
 	}
 	return 0, 0, fmt.Errorf("proxy type is not Clash")
 }
@@ -175,7 +224,7 @@ func ping(p interfaces.Vendor, url string, withAvg uint16, maxAttempt int, timeo
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Millisecond)
 		delayRTT, delay := uint16(0), uint16(0)
 		if pingFunc != nil {
-			//utils.DLog("using customized ping function")
+			utils.DLog("using customized ping function")
 			delayRTT, delay, _ = pingFunc(ctx, p, url)
 		} else if strings.HasPrefix(url, "https:") {
 			delayRTT, delay, _ = pingViaTrace(ctx, p, url)
