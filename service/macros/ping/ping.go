@@ -207,7 +207,7 @@ func pingViaClash(ctx context.Context, p interfaces.Vendor, url string) (uint16,
 }
 
 // pingFunc is optional and allows customizing the ping function.
-func ping(p interfaces.Vendor, url string, withAvg uint16, maxAttempt int, timeout uint, pingFunc pingFuncType) (uint16, uint16) {
+func ping(p interfaces.Vendor, url string, withAvg uint16, maxAttempt int, timeout uint, useClashPing bool) (uint16, uint16) {
 	if p == nil {
 		return 0, 0
 	}
@@ -223,9 +223,9 @@ func ping(p interfaces.Vendor, url string, withAvg uint16, maxAttempt int, timeo
 	for failNum+len(totalMS) < maxAttempt && len(totalMS) < int(withAvg) && maxAttempt-failNum >= int(withAvg) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Millisecond)
 		delayRTT, delay := uint16(0), uint16(0)
-		if pingFunc != nil {
-			utils.DLog("using customized ping function")
-			delayRTT, delay, _ = pingFunc(ctx, p, url)
+		if useClashPing {
+			utils.DLog("using Clash ping")
+			delayRTT, delay, _ = pingViaClash(ctx, p, url)
 		} else if strings.HasPrefix(url, "https:") {
 			delayRTT, delay, _ = pingViaTrace(ctx, p, url)
 		} else {
