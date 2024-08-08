@@ -1,7 +1,5 @@
 github.com/3andne/restls-client-go v0.1.6 h1:tRx/YilqW7iHpgmEL4E1D8dAsuB0tFF3uvncS+B6I08=
 github.com/3andne/restls-client-go v0.1.6/go.mod h1:iEdTZNt9kzPIxjIGSMScUFSBrUH6bFRNg0BWlP4orEY=
-github.com/Dreamacro/clash v1.11.4 h1:ZQe/7G+JclA1vvyAn8MtaEBvQK73mWR6lV3BceDaJoY=
-github.com/Dreamacro/clash v1.11.4/go.mod h1:ParIZ6P19q5GDgRE+HV/co7GunFRmvN31YFgNp4cwDw=
 github.com/RyuaNerin/elliptic2 v1.0.0/go.mod h1:wWB8fWrJI/6EPJkyV/r1Rj0hxUgrusmqSj8JN6yNf/A=
 github.com/RyuaNerin/go-krypto v1.2.4 h1:mXuNdK6M317aPV0llW6Xpjbo4moOlPF7Yxz4tb4b4Go=
 github.com/RyuaNerin/go-krypto v1.2.4/go.mod h1:QqCYkoutU3yInyD9INt2PGolVRsc3W4oraQadVGXJ/8=
@@ -142,8 +140,6 @@ github.com/metacubex/tfo-go v0.0.0-20240228025757-be1269474a66 h1:as/aO/fM8nv4W4
 github.com/metacubex/tfo-go v0.0.0-20240228025757-be1269474a66/go.mod h1:c7bVFM9f5+VzeZ/6Kg77T/jrg1Xp8QpqlSHvG/aXVts=
 github.com/metacubex/utls v1.6.6 h1:3D12YKHTf2Z41UPhQU2dWerNWJ5TVQD9gKoQ+H+iLC8=
 github.com/metacubex/utls v1.6.6/go.mod h1:+WLFUnXjcpdxXCnyX25nggw8C6YonZ8zOK2Zm/oRvdo=
-github.com/miaokobot/miaospeed v0.0.0-20230313132009-0234a01d9daa h1:Qlt3cWcwoHr/qfZs9MWJX2EDl/ber93Hwrxadz5W7A0=
-github.com/miaokobot/miaospeed v0.0.0-20230313132009-0234a01d9daa/go.mod h1:tOrQVocq0iS2m9y58r0WswRSZDkS42fwv2y8NoWBwhc=
 github.com/miekg/dns v1.1.61 h1:nLxbwF3XxhwVSm8g9Dghm9MHPaUZuqhPiGL+675ZmEs=
 github.com/miekg/dns v1.1.61/go.mod h1:mnAarhS3nWaW+NVP2wTkYVIZyHNJ098SJZUki3eykwQ=
 github.com/modern-go/concurrent v0.0.0-20180228061459-e0a39a4cb421/go.mod h1:6dJC0mAP4ikYIbvyc7fijjWJddQyLn8Ig3JB5CqoB9Q=
@@ -237,8 +233,6 @@ github.com/yusufpapurcu/wmi v1.2.4 h1:zFUKzehAFReQwLys1b/iSMl+JQGSCSjtVqQn9bBrPo
 github.com/yusufpapurcu/wmi v1.2.4/go.mod h1:SBZ9tNy3G9/m5Oi98Zks0QjeHVDvuK0qfxQmPyzfmi0=
 gitlab.com/yawning/bsaes.git v0.0.0-20190805113838-0a714cd429ec h1:FpfFs4EhNehiVfzQttTuxanPIT43FtkkCFypIod8LHo=
 gitlab.com/yawning/bsaes.git v0.0.0-20190805113838-0a714cd429ec/go.mod h1:BZ1RAoRPbCxum9Grlv5aeksu2H8BiKehBYooU2LFiOQ=
-go.uber.org/atomic v1.9.0 h1:ECmE8Bn/WFTYwEW/bpKD3M8VtR/zQVbavAoalC1PYyE=
-go.uber.org/atomic v1.9.0/go.mod h1:fEN4uk6kAWBTFdckzkM89CLk9XfWZrxpCo0nPH17wJc=
 go.uber.org/mock v0.4.0 h1:VcM4ZOtdbR4f6VXfiOpwpVJDL6lCReaZ6mw31wqh7KU=
 go.uber.org/mock v0.4.0/go.mod h1:a6FSlNadKUHUa9IP5Vyt1zh4fC7uAwxMutEAscFbkZc=
 go4.org/netipx v0.0.0-20231129151722-fdeea329fbba h1:0b9z3AuHCjxk0x/opv64kcgZLBseWJUpBw5I82+2U4M=
