@@ -1,9 +1,9 @@
 package factory
 
 import (
-	"github.com/AiportR/miaospeed/engine/helpers"
-	"github.com/AiportR/miaospeed/interfaces"
-	"github.com/AiportR/miaospeed/vendors"
+	"github.com/airportr/miaospeed/engine/helpers"
+	"github.com/airportr/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/vendors"
 	"github.com/dop251/goja"
 )
 

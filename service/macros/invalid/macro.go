@@ -1,6 +1,6 @@
 package invalid
 
-import "github.com/AiportR/miaospeed/interfaces"
+import "github.com/airportr/miaospeed/interfaces"
 
 type Invalid struct{}
 

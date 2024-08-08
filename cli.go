@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/AiportR/miaospeed/utils"
+	"github.com/airportr/miaospeed/utils"
 )
 
 var cmdName string = "miaospeed"

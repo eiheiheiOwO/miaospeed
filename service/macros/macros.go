@@ -1,16 +1,16 @@
 package macros
 
 import (
-	"github.com/AiportR/miaospeed/interfaces"
-	"github.com/AiportR/miaospeed/utils/structs"
+	"github.com/airportr/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/utils/structs"
 
-	"github.com/AiportR/miaospeed/service/macros/geo"
-	"github.com/AiportR/miaospeed/service/macros/ping"
-	"github.com/AiportR/miaospeed/service/macros/script"
-	"github.com/AiportR/miaospeed/service/macros/speed"
-	"github.com/AiportR/miaospeed/service/macros/udp"
+	"github.com/airportr/miaospeed/service/macros/geo"
+	"github.com/airportr/miaospeed/service/macros/ping"
+	"github.com/airportr/miaospeed/service/macros/script"
+	"github.com/airportr/miaospeed/service/macros/speed"
+	"github.com/airportr/miaospeed/service/macros/udp"
 
-	"github.com/AiportR/miaospeed/service/macros/invalid"
+	"github.com/airportr/miaospeed/service/macros/invalid"
 )
 
 var registeredList = map[interfaces.SlaveRequestMacroType]func() interfaces.SlaveRequestMacro{

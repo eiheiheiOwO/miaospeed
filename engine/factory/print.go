@@ -3,7 +3,7 @@ package factory
 import (
 	"fmt"
 
-	"github.com/AiportR/miaospeed/utils"
+	"github.com/airportr/miaospeed/utils"
 	"github.com/dop251/goja"
 )
 

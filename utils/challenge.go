@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"strings"
 
-	"github.com/AiportR/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/interfaces"
 	jsoniter "github.com/json-iterator/go"
 )
 

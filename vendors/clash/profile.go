@@ -1,8 +1,8 @@
 package clash
 
 import (
-	"github.com/AiportR/miaospeed/interfaces"
-	"github.com/AiportR/miaospeed/utils"
+	"github.com/airportr/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/utils"
 	"github.com/metacubex/mihomo/adapter"
 	"github.com/metacubex/mihomo/constant"
 	"gopkg.in/yaml.v2"

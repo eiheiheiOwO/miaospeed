@@ -8,14 +8,14 @@ import (
 	"os"
 	"strings"
 
-	"github.com/AiportR/miaospeed/interfaces"
-	"github.com/AiportR/miaospeed/preconfigs"
-	"github.com/AiportR/miaospeed/utils"
-	"github.com/AiportR/miaospeed/utils/structs"
+	"github.com/airportr/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/preconfigs"
+	"github.com/airportr/miaospeed/utils"
+	"github.com/airportr/miaospeed/utils/structs"
 	"github.com/gorilla/websocket"
 
-	"github.com/AiportR/miaospeed/service/matrices"
-	"github.com/AiportR/miaospeed/service/taskpoll"
+	"github.com/airportr/miaospeed/service/matrices"
+	"github.com/airportr/miaospeed/service/taskpoll"
 )
 
 type WsHandler struct {

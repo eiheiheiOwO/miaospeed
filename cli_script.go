@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/AiportR/miaospeed/interfaces"
-	"github.com/AiportR/miaospeed/service/macros/script"
-	"github.com/AiportR/miaospeed/utils"
-	"github.com/AiportR/miaospeed/vendors"
+	"github.com/airportr/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/service/macros/script"
+	"github.com/airportr/miaospeed/utils"
+	"github.com/airportr/miaospeed/vendors"
 )
 
 type ScriptTestCliParams struct {

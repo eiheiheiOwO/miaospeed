@@ -6,7 +6,7 @@ import (
 	"github.com/metacubex/mihomo/constant"
 	"net"
 
-	"github.com/AiportR/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/interfaces"
 )
 
 type Invalid struct {

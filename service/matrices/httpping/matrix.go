@@ -1,8 +1,8 @@
 package httpping
 
 import (
-	"github.com/AiportR/miaospeed/interfaces"
-	"github.com/AiportR/miaospeed/service/macros/ping"
+	"github.com/airportr/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/service/macros/ping"
 )
 
 type HTTPPing struct {

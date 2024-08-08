@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/AiportR/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/interfaces"
 	"github.com/metacubex/mihomo/component/resolver"
 	"github.com/metacubex/mihomo/constant"
 )

@@ -9,10 +9,10 @@ import (
 	"github.com/dop251/goja_nodejs/console"
 	"github.com/dop251/goja_nodejs/require"
 
-	"github.com/AiportR/miaospeed/engine/factory"
-	"github.com/AiportR/miaospeed/interfaces"
-	"github.com/AiportR/miaospeed/utils"
-	"github.com/AiportR/miaospeed/utils/structs"
+	"github.com/airportr/miaospeed/engine/factory"
+	"github.com/airportr/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/utils"
+	"github.com/airportr/miaospeed/utils/structs"
 )
 
 func VMNew() *goja.Runtime {

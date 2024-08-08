@@ -4,9 +4,9 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/AiportR/miaospeed/engine"
-	"github.com/AiportR/miaospeed/engine/helpers"
-	"github.com/AiportR/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/engine"
+	"github.com/airportr/miaospeed/engine/helpers"
+	"github.com/airportr/miaospeed/interfaces"
 	"github.com/dop251/goja"
 )
 
