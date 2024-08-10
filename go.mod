@@ -1,6 +1,6 @@
 module github.com/airportr/miaospeed
 
-go 1.22
+go 1.21
 
 require (
 	github.com/dop251/goja v0.0.0-20240806095544-3491d4a58fbe

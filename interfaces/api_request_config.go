@@ -29,15 +29,13 @@ const (
 
 type SlaveRequestConfigsV2 struct {
 	*SlaveRequestConfigsV1
-	ApiVersion   int  `yaml:"apiVersion,omitempty" cf:"name=🧬API版本，用于兼容Miaoko"`
-	UseClashPing bool `yaml:"useClashPing,omitempty" cf:"name=🐱使用Clash内置延迟测试"`
+	ApiVersion int `yaml:"apiVersion,omitempty" cf:"name=🧬API版本，用于兼容Miaoko以及其他客户端"`
 }
 
 func (srcv2 *SlaveRequestConfigsV2) Clone() *SlaveRequestConfigsV2 {
 	return &SlaveRequestConfigsV2{
 		SlaveRequestConfigsV1: srcv2.SlaveRequestConfigsV1.Clone(),
 		ApiVersion:            srcv2.ApiVersion,
-		UseClashPing:          srcv2.UseClashPing,
 	}
 }
 

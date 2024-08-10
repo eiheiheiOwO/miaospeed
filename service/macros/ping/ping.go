@@ -18,8 +18,6 @@ import (
 	"github.com/airportr/miaospeed/utils/structs"
 )
 
-type pingFuncType func(ctx context.Context, p interfaces.Vendor, url string) (uint16, uint16, error)
-
 func pingViaTrace(ctx context.Context, p interfaces.Vendor, url string) (uint16, uint16, error) {
 	transport := &http.Transport{
 		//Dial: func(string, string) (net.Conn, error) {
@@ -74,6 +72,7 @@ func pingViaTrace(ctx context.Context, p interfaces.Vendor, url string) (uint16,
 	if resp, err := transport.RoundTrip(req); err != nil {
 		return 0, 0, err
 	} else {
+		defer resp.Body.Close()
 		connEnd := time.Now().UnixMilli()
 		utils.DBlackhole(!strings.HasPrefix(url, "https:"), connEnd-writeEnd, writeEnd-tlsEnd, tlsEnd-tlsStart, tlsStart-connStart)
 		if !strings.HasPrefix(url, "https:") {
@@ -101,14 +100,12 @@ func pingViaNetCat(ctx context.Context, p interfaces.Vendor, url string) (uint16
 
 	data = structs.X(preconfigs.NETCAT_HTTP_PAYLOAD, data, purl.Hostname(), utils.VERSION)
 
-	connStart := time.Now().UnixMilli()
+	connStart := time.Now()
 	conn, err := p.DialTCP(ctx, url, interfaces.ROptionsTCP)
 	if err != nil || conn == nil {
 		return 0, 0, fmt.Errorf("cannot dial remote address")
 	}
-	defer func() {
-		_ = conn.Close()
-	}()
+	defer conn.Close()
 
 	_ = conn.SetDeadline(time.Now().Add(time.Second * 6))
 	reader := bufio.NewReader(conn)
@@ -118,95 +115,30 @@ func pingViaNetCat(ctx context.Context, p interfaces.Vendor, url string) (uint16
 	if _, err := conn.Write([]byte(data)); err != nil {
 		return 0, 0, fmt.Errorf("cannot write payload to remote")
 	}
-	_, _, _ = reader.ReadLine()
+	_, _ = reader.ReadByte()
+	rtt1 := time.Since(connStart).Milliseconds()
+	//_, _, _ = reader.ReadLine()
 	for reader.Buffered() > 0 {
 		_, _, _ = reader.ReadLine()
 	}
-	httpStartReq2 := time.Now().UnixMilli()
+
+	httpStartReq2 := time.Now()
 	if _, err := conn.Write([]byte(data)); err != nil {
 		return 0, 0, fmt.Errorf("cannot write payload to remote")
 	}
-	_, _, _ = reader.ReadLine()
+	_, _ = reader.ReadByte()
+	//_, _, _ = reader.ReadLine()
+
+	rtt2 := time.Since(httpStartReq2).Milliseconds()
 	for reader.Buffered() > 0 {
 		_, _, _ = reader.ReadLine()
 	}
-	httpEnd := time.Now().UnixMilli()
-
-	return uint16(httpEnd - httpStartReq2), uint16(httpStartReq2 - connStart), nil
-}
-func pingViaClash(ctx context.Context, p interfaces.Vendor, url string) (uint16, uint16, error) {
-	if p.Type() == interfaces.VendorClash {
-
-		var rtt uint16 = 0
-		var rtt2 uint16 = 0
-
-		start := time.Now()
-		instance, err := p.DialTCP(ctx, url, interfaces.ROptionsTCP)
-		if err != nil {
-			return 0, 0, err
-		}
-		defer func() {
-			_ = instance.Close()
-		}()
-
-		req, err := http.NewRequest(http.MethodGet, url, nil)
-		if err != nil {
-			return 0, 0, err
-		}
-		req = req.WithContext(ctx)
-
-		transport := &http.Transport{
-			DialContext: func(context.Context, string, string) (net.Conn, error) {
-				return instance, nil
-			},
-			// from http.DefaultTransport
-			MaxIdleConns:          100,
-			IdleConnTimeout:       3 * time.Second,
-			TLSHandshakeTimeout:   3 * time.Second,
-			ExpectContinueTimeout: 1 * time.Second,
-			TLSClientConfig: &tls.Config{
-				InsecureSkipVerify: false,
-				// for version prior to tls1.3, the handshake will take 2-RTTs,
-				// plus, majority server supports tls1.3, so we set a limit here
-				MinVersion: tls.VersionTLS13,
-				RootCAs:    preconfigs.MiaokoRootCAPrepare(),
-			},
-		}
-
-		client := http.Client{
-			Timeout:   30 * time.Second,
-			Transport: transport,
-			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				return http.ErrUseLastResponse
-			},
-		}
-
-		defer client.CloseIdleConnections()
-
-		resp, err := client.Do(req)
-
-		if err != nil {
-			rtt2 = 0
-		} else {
-			rtt2 = uint16(time.Since(start) / time.Millisecond)
-			_ = resp.Body.Close()
-		}
-		var start2 = time.Now()
-		resp, err = client.Do(req)
-		if err != nil {
-			rtt = 0
-		} else {
-			rtt = uint16(time.Since(start2) / time.Millisecond)
-			_ = resp.Body.Close()
-		}
-
-		return rtt, rtt2, nil
-	}
-	return 0, 0, fmt.Errorf("proxy type is not Clash")
+	utils.DBlackholef("http response time1: %d, %d", uint16(rtt2), uint16(rtt1))
+	return uint16(rtt2), uint16(rtt1), nil
 }
 
 // pingFunc is optional and allows customizing the ping function.
-func ping(p interfaces.Vendor, url string, withAvg uint16, maxAttempt int, timeout uint, useClashPing bool) (uint16, uint16) {
+func ping(p interfaces.Vendor, url string, withAvg uint16, maxAttempt int, timeout uint) (uint16, uint16) {
 	if p == nil {
 		return 0, 0
 	}
@@ -222,10 +154,7 @@ func ping(p interfaces.Vendor, url string, withAvg uint16, maxAttempt int, timeo
 	for failNum+len(totalMS) < maxAttempt && len(totalMS) < int(withAvg) && maxAttempt-failNum >= int(withAvg) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Millisecond)
 		delayRTT, delay := uint16(0), uint16(0)
-		if useClashPing {
-			utils.DLog("using Clash ping")
-			delayRTT, delay, _ = pingViaClash(ctx, p, url)
-		} else if strings.HasPrefix(url, "https:") {
+		if strings.HasPrefix(url, "https:") {
 			delayRTT, delay, _ = pingViaTrace(ctx, p, url)
 		} else {
 			delayRTT, delay, _ = pingViaNetCat(ctx, p, url)
