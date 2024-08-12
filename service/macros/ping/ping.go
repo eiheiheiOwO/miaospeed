@@ -159,7 +159,7 @@ func ping(p interfaces.Vendor, url string, withAvg uint16, maxAttempt int, timeo
 		} else {
 			delayRTT, delay, _ = pingViaNetCat(ctx, p, url)
 		}
-		if delayRTT > 0 {
+		if delay > 0 {
 			totalMSRTT = append(totalMSRTT, delayRTT)
 			totalMS = append(totalMS, delay)
 		} else {
@@ -170,8 +170,8 @@ func ping(p interfaces.Vendor, url string, withAvg uint16, maxAttempt int, timeo
 
 	resultRTT, result := uint16(0), uint16(0)
 	if len(totalMSRTT) >= int(withAvg) {
-		resultRTT = computeAvgOfPing(totalMSRTT)
-		result = computeAvgOfPing(totalMS)
+		resultRTT = calcAvgPing(totalMSRTT)
+		result = calcAvgPing(totalMS)
 	}
 	return resultRTT, result
 }
