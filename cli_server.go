@@ -5,13 +5,13 @@ import (
 	"os"
 	"strings"
 
+	"github.com/airportr/miaospeed/preconfigs"
 	"github.com/airportr/miaospeed/service"
 	"github.com/airportr/miaospeed/utils"
 )
 
 func InitConfigServer() *utils.GlobalConfig {
 	gcfg := &utils.GCFG
-
 	sflag := flag.NewFlagSet(cmdName+" server", flag.ExitOnError)
 	sflag.StringVar(&gcfg.Token, "token", "", "specify the token used to sign request")
 	sflag.StringVar(&gcfg.Binder, "bind", "", "bind a socket, can be format like 0.0.0.0:8080 or /tmp/unix_socket")
@@ -21,15 +21,34 @@ func InitConfigServer() *utils.GlobalConfig {
 	sflag.BoolVar(&gcfg.MiaoKoSignedTLS, "mtls", false, "enable miaoko certs for tls verification")
 	sflag.BoolVar(&gcfg.NoSpeedFlag, "nospeed", false, "decline all speedtest requests")
 	sflag.StringVar(&gcfg.MaxmindDB, "mmdb", "", "reroute all geoip query to local mmdbs. for example: test.mmdb,testcity.mmdb")
-
+	path := sflag.String("path", "", "specific websocket path you want, default '/'")
 	whiteList := sflag.String("whitelist", "", "bot id whitelist, can be format like 1111,2222,3333")
+	pubKeyStr := sflag.String("serverpublickey", "", "specific the sever public key (PEM format)")
+	privKeyStr := sflag.String("serverprivatekey", "", "specific the sever private key (PEM format)")
 	parseFlag(sflag)
 
 	gcfg.WhiteList = make([]string, 0)
 	if *whiteList != "" {
 		gcfg.WhiteList = strings.Split(*whiteList, ",")
 	}
+	if *path != "" {
+		if *path == "/" {
+			gcfg.Path = "/"
+		}
+		gcfg.Path = "/" + strings.TrimPrefix(*path, "/")
+	} else {
+		// deprecated
+		gcfg.Path = "/"
+	}
 
+	if pubKey := utils.ReadFile(*pubKeyStr); pubKey != "" {
+		utils.DLog("Override predefined certificates")
+		preconfigs.MIAOKO_TLS_CRT = pubKey
+	}
+	if priKey := utils.ReadFile(*privKeyStr); priKey != "" {
+		utils.DLog("Override predefined certificates")
+		preconfigs.MIAOKO_TLS_KEY = priKey
+	}
 	return gcfg
 }
 

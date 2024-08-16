@@ -40,7 +40,6 @@ func InitServer() {
 	}
 
 	utils.DWarnf("MiaoSpeed Server | Start Listening, bind=%s", utils.GCFG.Binder)
-
 	wsHandler := WsHandler{
 		Serve: func(rw http.ResponseWriter, r *http.Request) {
 			conn, err := upgrader.Upgrade(rw, r, nil)
@@ -49,7 +48,14 @@ func InitServer() {
 				return
 			}
 			defer conn.Close()
-
+			// Verify the websocket path
+			if !utils.GCFG.ValidateWSPath(r.URL.Path) {
+				conn.WriteJSON(&interfaces.SlaveResponse{
+					Error: "invalid websocket path",
+				})
+				utils.DWarnf("MiaoServer Test | websocket path error, error=%s", "invalid websocket path")
+				return
+			}
 			var poll *taskpoll.TaskPollController
 
 			batches := structs.NewAsyncMap[string, bool]()
@@ -66,7 +72,7 @@ func InitServer() {
 				sr := interfaces.SlaveRequest{}
 				_, r, err := conn.NextReader()
 				if err == nil {
-					// 新
+					// unsafe, ensure jsoniter package receives frequently security updates.
 					err = jsoniter.NewDecoder(r).Decode(&sr)
 					// 原方案
 					//err = json.NewDecoder(r).Decode(&sr)
@@ -80,7 +86,6 @@ func InitServer() {
 					if !strings.Contains(err.Error(), "EOF") && !strings.Contains(err.Error(), "reset by peer") {
 						utils.DErrorf("MiaoServer Test | Task receiving error, error=%s", err.Error())
 					}
-
 					return
 				}
 				verified := utils.GCFG.VerifyRequest(&sr)
@@ -104,10 +109,10 @@ func InitServer() {
 				}
 
 				// find all matrices
-				matrices := matrices.FindBatchFromEntry(sr.Options.Matrices)
+				mtrx := matrices.FindBatchFromEntry(sr.Options.Matrices)
 
 				// extra macro from the matrices
-				macros := ExtractMacrosFromMatrices(matrices)
+				macros := ExtractMacrosFromMatrices(mtrx)
 
 				// select poll
 				if structs.Contains(macros, interfaces.MacroSpeed) {

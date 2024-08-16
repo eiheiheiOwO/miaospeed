@@ -3,6 +3,7 @@ package utils
 import (
 	"github.com/airportr/miaospeed/interfaces"
 	"github.com/airportr/miaospeed/utils/structs"
+	"strings"
 )
 
 type GlobalConfig struct {
@@ -15,6 +16,7 @@ type GlobalConfig struct {
 	MiaoKoSignedTLS  bool
 	NoSpeedFlag      bool
 	MaxmindDB        string
+	Path             string
 }
 
 func (gc *GlobalConfig) InWhiteList(invoker string) bool {
@@ -31,6 +33,14 @@ func (gc *GlobalConfig) VerifyRequest(req *interfaces.SlaveRequest) bool {
 
 func (gc *GlobalConfig) SignRequest(req *interfaces.SlaveRequest) string {
 	return SignRequest(gc.Token, req)
+}
+
+func (gc *GlobalConfig) ValidateWSPath(path string) bool {
+	DLogf("Path to the websocket to be validated: %s, Predefined websocket path: %s\n", path, gc.Path)
+	if strings.HasPrefix(path, gc.Path) {
+		return true
+	}
+	return false
 }
 
 var GCFG GlobalConfig
