@@ -3,7 +3,6 @@ package utils
 import (
 	"github.com/airportr/miaospeed/interfaces"
 	"github.com/airportr/miaospeed/utils/structs"
-	"strings"
 )
 
 type GlobalConfig struct {
@@ -37,10 +36,7 @@ func (gc *GlobalConfig) SignRequest(req *interfaces.SlaveRequest) string {
 
 func (gc *GlobalConfig) ValidateWSPath(path string) bool {
 	DLogf("Path to the websocket to be validated: %s, Predefined websocket path: %s\n", path, gc.Path)
-	if strings.HasPrefix(path, gc.Path) {
-		return true
-	}
-	return false
+	return path == gc.Path
 }
 
 var GCFG GlobalConfig
