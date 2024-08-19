@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"strings"
 
@@ -40,19 +41,24 @@ func InitConfigServer() *utils.GlobalConfig {
 		// deprecated
 		gcfg.Path = "/"
 	}
-
+	if gcfg.Path == "/" {
+		utils.DWarnf("MiaoSpeed Server Warning | using an unsafe websocket connection path: %s", gcfg.Path)
+	} else {
+		utils.DWarnf("MiaoSpeed Server | using a custom websocket connection path: %s", gcfg.Path)
+	}
 	if pubKey := utils.ReadFile(*pubKeyStr); pubKey != "" {
-		utils.DLog("Override predefined certificates")
+		utils.DLog("Override predefined tls certificates")
 		preconfigs.MIAOKO_TLS_CRT = pubKey
 	}
 	if priKey := utils.ReadFile(*privKeyStr); priKey != "" {
-		utils.DLog("Override predefined certificates")
+		utils.DLog("Override predefined tls key")
 		preconfigs.MIAOKO_TLS_KEY = priKey
 	}
 	return gcfg
 }
 
 func RunCliServer() {
+	fmt.Println(utils.LOGO)
 	InitConfigServer()
 	utils.DWarnf("MiaoSpeed speedtesting client %s", utils.VERSION)
 
