@@ -12,9 +12,13 @@ const (
 	MatrixInboundGeoIP  SlaveRequestMatrixType = "GEOIP_INBOUND"
 	MatrixOutboundGeoIP SlaveRequestMatrixType = "GEOIP_OUTBOUND"
 
-	MatrixScriptTest SlaveRequestMatrixType = "TEST_SCRIPT"
-	MatrixHTTPPing   SlaveRequestMatrixType = "TEST_PING_CONN"
-	MatrixRTTPing    SlaveRequestMatrixType = "TEST_PING_RTT"
+	MatrixScriptTest    SlaveRequestMatrixType = "TEST_SCRIPT"
+	MatrixHTTPPing      SlaveRequestMatrixType = "TEST_PING_CONN"
+	MatrixRTTPing       SlaveRequestMatrixType = "TEST_PING_RTT"
+	MatrixMAXHTTPPing   SlaveRequestMatrixType = "TEST_PING_MAX_CONN"
+	MatrixMAXRTTPing    SlaveRequestMatrixType = "TEST_PING_MAX_RTT"
+	MatrixTotalHTTPPing SlaveRequestMatrixType = "TEST_PING_TOTAL_CONN"
+	MatrixTotalRTTPing  SlaveRequestMatrixType = "TEST_PING_TOTAL_RTT"
 
 	MatrixInvalid SlaveRequestMatrixType = "INVALID"
 )
@@ -28,7 +32,8 @@ func (srmt *SlaveRequestMatrixType) Valid() bool {
 	case MatrixAverageSpeed, MatrixMaxSpeed, MatrixPerSecondSpeed,
 		MatrixUDPType,
 		MatrixInboundGeoIP, MatrixOutboundGeoIP,
-		MatrixScriptTest, MatrixHTTPPing, MatrixRTTPing:
+		MatrixScriptTest, MatrixHTTPPing, MatrixRTTPing,
+		MatrixMAXHTTPPing, MatrixMAXRTTPing, MatrixTotalHTTPPing, MatrixTotalRTTPing:
 		return true
 	}
 

@@ -8,6 +8,7 @@ import (
 	"github.com/airportr/miaospeed/service/matrices/httpping"
 	"github.com/airportr/miaospeed/service/matrices/inboundgeoip"
 	"github.com/airportr/miaospeed/service/matrices/invalid"
+	"github.com/airportr/miaospeed/service/matrices/maxrttping"
 	"github.com/airportr/miaospeed/service/matrices/maxspeed"
 	"github.com/airportr/miaospeed/service/matrices/outboundgeoip"
 	"github.com/airportr/miaospeed/service/matrices/persecondspeed"
@@ -44,6 +45,18 @@ var registeredList = map[interfaces.SlaveRequestMatrixType]func() interfaces.Sla
 	interfaces.MatrixScriptTest: func() interfaces.SlaveRequestMatrix {
 		return &scripttest.ScriptTest{}
 	},
+	interfaces.MatrixMAXRTTPing: func() interfaces.SlaveRequestMatrix {
+		return &maxrttping.MaxRttPing{}
+	},
+	//interfaces.MatrixMAXHTTPPing: func() interfaces.SlaveRequestMatrix {
+	//	return &maxrttping.MaxRttPing{}
+	//},
+	//interfaces.MatrixTotalRTTPing: func() interfaces.SlaveRequestMatrix {
+	//	return &scripttest.ScriptTest{}
+	//},
+	//interfaces.MatrixTotalHTTPPing: func() interfaces.SlaveRequestMatrix {
+	//	return &scripttest.ScriptTest{}
+	//},
 }
 
 func Find(matrixType interfaces.SlaveRequestMatrixType) interfaces.SlaveRequestMatrix {

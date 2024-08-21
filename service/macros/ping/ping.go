@@ -137,21 +137,24 @@ func pingViaNetCat(ctx context.Context, p interfaces.Vendor, url string) (uint16
 	return uint16(rtt2), uint16(rtt1), nil
 }
 
-// pingFunc is optional and allows customizing the ping function.
-func ping(p interfaces.Vendor, url string, withAvg uint16, maxAttempt int, timeout uint) (uint16, uint16) {
-	if p == nil {
-		return 0, 0
-	}
-
-	failNum := 0
+func ping(obj *Ping, p interfaces.Vendor, url string, withAvg uint16, timeout uint) {
 	var totalMS []uint16
 	var totalMSRTT []uint16
+	if p == nil {
+		obj.RTT = 0
+		obj.Request = 0
+		obj.RTTList = totalMSRTT
+		obj.RequestList = totalMS
+		obj.MaxRTT = 0
+		obj.MaxRequest = 0
+	}
 
-	if withAvg < 1 || withAvg > uint16(maxAttempt) {
+	// 20 次足够了
+	if withAvg < 1 || withAvg > 20 {
 		withAvg = 1
 	}
 
-	for failNum+len(totalMS) < maxAttempt && len(totalMS) < int(withAvg) && maxAttempt-failNum >= int(withAvg) {
+	for len(totalMS) < int(withAvg) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Millisecond)
 		delayRTT, delay := uint16(0), uint16(0)
 		if strings.HasPrefix(url, "https:") {
@@ -159,19 +162,15 @@ func ping(p interfaces.Vendor, url string, withAvg uint16, maxAttempt int, timeo
 		} else {
 			delayRTT, delay, _ = pingViaNetCat(ctx, p, url)
 		}
-		if delay > 0 {
-			totalMSRTT = append(totalMSRTT, delayRTT)
-			totalMS = append(totalMS, delay)
-		} else {
-			failNum += 1
-		}
+		obj.MaxRTT = structs.Max(obj.MaxRTT, delayRTT)
+		obj.MaxRequest = structs.Max(obj.MaxRequest, delay)
+		totalMSRTT = append(totalMSRTT, delayRTT)
+		totalMS = append(totalMS, delay)
 		cancel()
 	}
 
-	resultRTT, result := uint16(0), uint16(0)
-	if len(totalMSRTT) >= int(withAvg) {
-		resultRTT = calcAvgPing(totalMSRTT)
-		result = calcAvgPing(totalMS)
-	}
-	return resultRTT, result
+	obj.RTT = calcAvgPing(totalMSRTT)
+	obj.Request = calcAvgPing(totalMS)
+	obj.RTTList = totalMSRTT
+	obj.RequestList = totalMS
 }

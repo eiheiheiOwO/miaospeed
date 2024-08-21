@@ -18,10 +18,26 @@ type MaxSpeedDS struct {
 	Value uint64
 }
 
+type MaxRTTDS struct {
+	Value uint16
+}
+
+type MaxHTTPDS struct {
+	Value uint16
+}
+
 type PerSecondSpeedDS struct {
 	Max     uint64
 	Average uint64
 	Speeds  []uint64
+}
+
+type TotalRTTDS struct {
+	values []uint16
+}
+
+type TotalHTTPDS struct {
+	values []uint16
 }
 
 type UDPTypeDS struct {

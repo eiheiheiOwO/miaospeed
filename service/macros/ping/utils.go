@@ -29,6 +29,9 @@ func calcAvgPing(values []uint16) uint16 {
 	result := uint16(0)
 	totalMS := values[:]
 	var nonZeroLatencies []uint16
+	if len(values) == 0 {
+		return 0
+	}
 	// 移除0值
 	for _, lat := range totalMS {
 		if lat != 0 {
