@@ -14,6 +14,8 @@ import (
 	"github.com/airportr/miaospeed/service/matrices/persecondspeed"
 	"github.com/airportr/miaospeed/service/matrices/rttping"
 	"github.com/airportr/miaospeed/service/matrices/scripttest"
+	"github.com/airportr/miaospeed/service/matrices/sdhttp"
+	"github.com/airportr/miaospeed/service/matrices/sdrtt"
 	"github.com/airportr/miaospeed/service/matrices/udptype"
 )
 
@@ -48,6 +50,8 @@ var registeredList = map[interfaces.SlaveRequestMatrixType]func() interfaces.Sla
 	interfaces.MatrixMAXRTTPing: func() interfaces.SlaveRequestMatrix {
 		return &maxrttping.MaxRttPing{}
 	},
+	interfaces.MatrixSDRTT:  func() interfaces.SlaveRequestMatrix { return &sdrtt.SDRTT{} },
+	interfaces.MatrixSDHTTP: func() interfaces.SlaveRequestMatrix { return &sdhttp.SDHTTP{} },
 	//interfaces.MatrixMAXHTTPPing: func() interfaces.SlaveRequestMatrix {
 	//	return &maxrttping.MaxRttPing{}
 	//},

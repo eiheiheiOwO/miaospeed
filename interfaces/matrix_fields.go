@@ -26,6 +26,13 @@ type MaxHTTPDS struct {
 	Value uint16
 }
 
+type SDRTTDS struct {
+	Value float64
+}
+type SDHTTPDS struct {
+	Value float64
+}
+
 type PerSecondSpeedDS struct {
 	Max     uint64
 	Average uint64

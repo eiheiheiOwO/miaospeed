@@ -9,6 +9,8 @@ type Ping struct {
 	Request     uint16
 	MaxRTT      uint16
 	MaxRequest  uint16
+	RTTSD       float64
+	RequestSD   float64
 	RTTList     []uint16
 	RequestList []uint16
 }

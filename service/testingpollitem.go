@@ -61,9 +61,7 @@ func (tpi *TestingPollItem) Yield(idx int, tpc *taskpoll.TaskPollController) {
 
 	defer func() {
 		utils.WrapErrorPure("Task yield error", recover())
-
 		tpi.results.Push(result)
-
 		tpi.onProcessLock.Lock()
 		defer tpi.onProcessLock.Unlock()
 		tpi.onProcess(tpi, idx, result)

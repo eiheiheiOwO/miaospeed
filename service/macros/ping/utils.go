@@ -1,6 +1,10 @@
 package ping
 
-import "sort"
+import (
+	"math"
+	"sort"
+)
+import "github.com/airportr/miaospeed/utils"
 
 func computeAvgOfPing(pings []uint16) uint16 {
 	result := uint16(0)
@@ -75,4 +79,12 @@ func calcAvgPing(values []uint16) uint16 {
 	average := float64(sum) / float64(len(trimmedLatencies))
 	result = uint16(average)
 	return result
+}
+
+func calcStdDevPing(values []uint16) float64 {
+	output := make([]float64, len(values))
+	for i, v := range values {
+		output[i] = float64(v)
+	}
+	return math.Round(utils.StandardDeviation(output)*10) / 10
 }

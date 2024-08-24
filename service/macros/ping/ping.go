@@ -173,4 +173,6 @@ func ping(obj *Ping, p interfaces.Vendor, url string, withAvg uint16, timeout ui
 	obj.Request = calcAvgPing(totalMS)
 	obj.RTTList = totalMSRTT
 	obj.RequestList = totalMS
+	obj.RTTSD = calcStdDevPing(totalMSRTT)
+	obj.RequestSD = calcStdDevPing(totalMS)
 }

@@ -173,7 +173,14 @@ func InitServer() {
 						//}
 					},
 				}).Init())
-
+				// onstart
+				conn.WriteJSON(&interfaces.SlaveResponse{
+					ID:               item.ID(),
+					MiaoSpeedVersion: utils.VERSION,
+					Progress: &interfaces.SlaveProgress{
+						Queuing: poll.AwaitingCount(),
+					},
+				})
 				batches.Set(item.ID(), true)
 			}
 		},

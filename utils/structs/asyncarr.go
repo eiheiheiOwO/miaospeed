@@ -53,6 +53,15 @@ func (aa *AsyncArr[T]) Push(val T) {
 	aa.store = append(aa.store, val)
 }
 
+func (aa *AsyncArr[T]) Len() int {
+	if aa == nil || aa.store == nil {
+		return 0
+	}
+	aa.lock.Lock()
+	defer aa.lock.Unlock()
+	return len(aa.store)
+}
+
 func (aa *AsyncArr[T]) Del(idx int) *T {
 	aa.lock.Lock()
 	defer aa.lock.Unlock()

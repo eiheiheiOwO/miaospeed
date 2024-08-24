@@ -19,8 +19,9 @@ const (
 	MatrixMAXRTTPing    SlaveRequestMatrixType = "TEST_PING_MAX_RTT"
 	MatrixTotalHTTPPing SlaveRequestMatrixType = "TEST_PING_TOTAL_CONN"
 	MatrixTotalRTTPing  SlaveRequestMatrixType = "TEST_PING_TOTAL_RTT"
-
-	MatrixInvalid SlaveRequestMatrixType = "INVALID"
+	MatrixSDRTT         SlaveRequestMatrixType = "TEST_PING_SD_RTT"
+	MatrixSDHTTP        SlaveRequestMatrixType = "TEST_PING_SD_CONN"
+	MatrixInvalid       SlaveRequestMatrixType = "INVALID"
 )
 
 func (srmt *SlaveRequestMatrixType) Valid() bool {
@@ -33,7 +34,9 @@ func (srmt *SlaveRequestMatrixType) Valid() bool {
 		MatrixUDPType,
 		MatrixInboundGeoIP, MatrixOutboundGeoIP,
 		MatrixScriptTest, MatrixHTTPPing, MatrixRTTPing,
-		MatrixMAXHTTPPing, MatrixMAXRTTPing, MatrixTotalHTTPPing, MatrixTotalRTTPing:
+		MatrixMAXHTTPPing, MatrixMAXRTTPing,
+		MatrixTotalHTTPPing, MatrixTotalRTTPing,
+		MatrixSDRTT, MatrixSDHTTP:
 		return true
 	}
 
