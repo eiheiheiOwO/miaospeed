@@ -10,6 +10,7 @@ type GlobalConfig struct {
 	Binder           string
 	WhiteList        []string
 	SpeedLimit       uint64
+	TaskLimit        uint
 	PauseSecond      uint
 	ConnTaskTreading uint
 	MiaoKoSignedTLS  bool

@@ -17,6 +17,7 @@ func InitConfigServer() *utils.GlobalConfig {
 	sflag.StringVar(&gcfg.Token, "token", "", "specify the token used to sign request")
 	sflag.StringVar(&gcfg.Binder, "bind", "", "bind a socket, can be format like 0.0.0.0:8080 or /tmp/unix_socket")
 	sflag.UintVar(&gcfg.ConnTaskTreading, "connthread", 64, "parallel threads when processing normal connectivity tasks")
+	sflag.UintVar(&gcfg.TaskLimit, "tasklimit", 1000, "limit of tasks in queue, default with 1000")
 	sflag.Uint64Var(&gcfg.SpeedLimit, "speedlimit", 0, "speed ratelimit (in Bytes per Second), default with no limits")
 	sflag.UintVar(&gcfg.PauseSecond, "pausesecond", 0, "pause such period after each speed job (seconds)")
 	sflag.BoolVar(&gcfg.MiaoKoSignedTLS, "mtls", false, "enable miaoko certs for tls verification")

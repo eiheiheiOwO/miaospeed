@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	jsoniter "github.com/json-iterator/go"
 	"io"
 	"net"
@@ -126,7 +127,15 @@ func InitServer() {
 				} else {
 					poll = ConnTaskPoll
 				}
-				utils.DLogf("MiaoServer Test | Receive Task, name=%s poll=%s", sr.Basics.ID, poll.Name())
+
+				awaitingCount := uint(poll.AwaitingCount())
+				if awaitingCount > utils.GCFG.TaskLimit {
+					conn.WriteJSON(&interfaces.SlaveResponse{
+						Error: fmt.Sprintf("too many tasks are waiting, please try later, current queuing=%d", awaitingCount),
+					})
+					return
+				}
+				utils.DLogf("MiaoServer Test | Receive Task, name=%s poll=%s awaitingCount=%d", sr.Basics.ID, poll.Name(), awaitingCount)
 
 				// build testing item
 				item := poll.Push((&TestingPollItem{
@@ -173,6 +182,7 @@ func InitServer() {
 						//}
 					},
 				}).Init())
+
 				// onstart
 				conn.WriteJSON(&interfaces.SlaveResponse{
 					ID:               item.ID(),

@@ -150,7 +150,7 @@ func ping(obj *Ping, p interfaces.Vendor, url string, withAvg uint16, timeout ui
 	}
 
 	// 20 次足够了
-	if withAvg < 1 || withAvg > 20 {
+	if withAvg < 1 || withAvg > 1000 {
 		withAvg = 1
 	}
 
