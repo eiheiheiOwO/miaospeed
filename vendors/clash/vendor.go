@@ -54,9 +54,6 @@ func (c *Clash) DialTCP(ctx context.Context, url string, network interfaces.Requ
 	if err != nil {
 		return nil, fmt.Errorf("cannot build tcp context")
 	}
-	if resolver.DisableIPv6 {
-		resolver.DisableIPv6 = false
-	}
 	conn, err := c.proxy.DialContext(ctx, &addr)
 	if err != nil {
 		utils.DLogf("cannot dialTCP: %s | proxy=%s | vendor=Clash | err=%s", url, c.proxy.Name(), err.Error())
@@ -72,9 +69,6 @@ func (c *Clash) DialUDP(ctx context.Context, url string) (net.PacketConn, error)
 	addr, err := urlToMetadata(url, constant.UDP)
 	if err != nil {
 		return nil, fmt.Errorf("cannot build udp context")
-	}
-	if resolver.DisableIPv6 {
-		resolver.DisableIPv6 = false
 	}
 	conn, err := c.proxy.DialUDP(&addr)
 	if err != nil {
