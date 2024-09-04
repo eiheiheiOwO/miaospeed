@@ -3,6 +3,7 @@ package clash
 import (
 	"context"
 	"fmt"
+	"github.com/airportr/miaospeed/utils"
 	"net"
 
 	"github.com/airportr/miaospeed/interfaces"
@@ -12,6 +13,12 @@ import (
 
 type Clash struct {
 	proxy constant.Proxy
+}
+
+func init() {
+	if resolver.DisableIPv6 {
+		resolver.DisableIPv6 = false
+	}
 }
 
 func (c *Clash) Proxy() constant.Proxy {
@@ -51,6 +58,9 @@ func (c *Clash) DialTCP(ctx context.Context, url string, network interfaces.Requ
 		resolver.DisableIPv6 = false
 	}
 	conn, err := c.proxy.DialContext(ctx, &addr)
+	if err != nil {
+		utils.DLogf("cannot dialTCP: %s | proxy=%s | vendor=Clash | err=%s", url, c.proxy.Name(), err.Error())
+	}
 	return conn, err
 }
 
@@ -66,7 +76,11 @@ func (c *Clash) DialUDP(ctx context.Context, url string) (net.PacketConn, error)
 	if resolver.DisableIPv6 {
 		resolver.DisableIPv6 = false
 	}
-	return c.proxy.DialUDP(&addr)
+	conn, err := c.proxy.DialUDP(&addr)
+	if err != nil {
+		utils.DLogf("cannot dialUDP: %s | proxy=%s | vendor=Clash | err=%s", url, c.proxy.Name(), err.Error())
+	}
+	return conn, err
 
 }
 func (c *Clash) ProxyInfo() interfaces.ProxyInfo {
