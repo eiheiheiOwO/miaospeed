@@ -24,7 +24,7 @@ type TestingPollItem struct {
 	results  *structs.AsyncArr[interfaces.SlaveEntrySlot]
 
 	onProcess  func(self *TestingPollItem, idx int, result interfaces.SlaveEntrySlot)
-	onExit     func(self *TestingPollItem, exitCode taskpoll.TaskPollExitCode)
+	onExit     func(self *TestingPollItem, exitCode taskpoll.TPExitCode)
 	calcWeight func(self *TestingPollItem) uint
 
 	onProcessLock sync.Mutex
@@ -52,7 +52,7 @@ func (tpi *TestingPollItem) Count() int {
 	return len(tpi.request.Nodes)
 }
 
-func (tpi *TestingPollItem) Yield(idx int, tpc *taskpoll.TaskPollController) {
+func (tpi *TestingPollItem) Yield(idx int, tpc *taskpoll.TPController) {
 	result := interfaces.SlaveEntrySlot{
 		ProxyInfo:      interfaces.ProxyInfo{},
 		InvokeDuration: -1,
@@ -103,7 +103,7 @@ func (tpi *TestingPollItem) Yield(idx int, tpc *taskpoll.TaskPollController) {
 	})
 }
 
-func (tpi *TestingPollItem) OnExit(exitCode taskpoll.TaskPollExitCode) {
+func (tpi *TestingPollItem) OnExit(exitCode taskpoll.TPExitCode) {
 	tpi.exitOnce.Do(func() {
 		tpi.onExit(tpi, exitCode)
 	})

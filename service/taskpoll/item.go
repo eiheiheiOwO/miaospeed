@@ -6,7 +6,7 @@ type TaskPollItem interface {
 	Weight() uint
 	Count() int
 
-	Yield(i int, tpc *TaskPollController)
-	OnExit(exitCode TaskPollExitCode)
+	Yield(i int, tpc *TPController)
+	OnExit(exitCode TPExitCode)
 	Init() TaskPollItem
 }

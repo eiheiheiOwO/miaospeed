@@ -48,16 +48,18 @@ func InitServer() {
 				utils.DErrorf("MiaoServer Test | Socket establishing error, error=%s", err.Error())
 				return
 			}
-			defer conn.Close()
+			defer func() {
+				_ = conn.Close()
+			}()
 			// Verify the websocket path
 			if !utils.GCFG.ValidateWSPath(r.URL.Path) {
-				conn.WriteJSON(&interfaces.SlaveResponse{
+				_ = conn.WriteJSON(&interfaces.SlaveResponse{
 					Error: "invalid websocket path",
 				})
 				utils.DWarnf("MiaoServer Test | websocket path error, error=%s", "invalid websocket path")
 				return
 			}
-			var poll *taskpoll.TaskPollController
+			var poll *taskpoll.TPController
 
 			batches := structs.NewAsyncMap[string, bool]()
 			cancel := func() {
@@ -94,7 +96,7 @@ func InitServer() {
 
 				// verify token
 				if !verified {
-					conn.WriteJSON(&interfaces.SlaveResponse{
+					_ = conn.WriteJSON(&interfaces.SlaveResponse{
 						Error: "cannot verify the request, please check your token",
 					})
 					return
@@ -103,7 +105,7 @@ func InitServer() {
 
 				// verify invoker
 				if !utils.GCFG.InWhiteList(sr.Basics.Invoker) {
-					conn.WriteJSON(&interfaces.SlaveResponse{
+					_ = conn.WriteJSON(&interfaces.SlaveResponse{
 						Error: "the bot id is not in the whitelist",
 					})
 					return
@@ -118,7 +120,7 @@ func InitServer() {
 				// select poll
 				if structs.Contains(macros, interfaces.MacroSpeed) {
 					if utils.GCFG.NoSpeedFlag {
-						conn.WriteJSON(&interfaces.SlaveResponse{
+						_ = conn.WriteJSON(&interfaces.SlaveResponse{
 							Error: "speedtest is disabled on backend",
 						})
 						return
@@ -128,9 +130,9 @@ func InitServer() {
 					poll = ConnTaskPoll
 				}
 
-				awaitingCount := uint(poll.AwaitingCount())
+				awaitingCount := uint(poll.UnsafeAwaitingCount())
 				if awaitingCount > utils.GCFG.TaskLimit {
-					conn.WriteJSON(&interfaces.SlaveResponse{
+					_ = conn.WriteJSON(&interfaces.SlaveResponse{
 						Error: fmt.Sprintf("too many tasks are waiting, please try later, current queuing=%d", awaitingCount),
 					})
 					return
@@ -145,7 +147,7 @@ func InitServer() {
 					matrices: sr.Options.Matrices,
 					macros:   macros,
 					onProcess: func(self *TestingPollItem, idx int, result interfaces.SlaveEntrySlot) {
-						conn.WriteJSON(&interfaces.SlaveResponse{
+						_ = conn.WriteJSON(&interfaces.SlaveResponse{
 							ID:               self.ID(),
 							MiaoSpeedVersion: utils.VERSION,
 							Progress: &interfaces.SlaveProgress{
@@ -155,9 +157,9 @@ func InitServer() {
 							},
 						})
 					},
-					onExit: func(self *TestingPollItem, exitCode taskpoll.TaskPollExitCode) {
+					onExit: func(self *TestingPollItem, exitCode taskpoll.TPExitCode) {
 						batches.Del(self.ID())
-						conn.WriteJSON(&interfaces.SlaveResponse{
+						_ = conn.WriteJSON(&interfaces.SlaveResponse{
 							ID:               self.ID(),
 							MiaoSpeedVersion: utils.VERSION,
 							Result: &interfaces.SlaveTask{
@@ -184,7 +186,7 @@ func InitServer() {
 				}).Init())
 
 				// onstart
-				conn.WriteJSON(&interfaces.SlaveResponse{
+				_ = conn.WriteJSON(&interfaces.SlaveResponse{
 					ID:               item.ID(),
 					MiaoSpeedVersion: utils.VERSION,
 					Progress: &interfaces.SlaveProgress{
@@ -207,7 +209,10 @@ func InitServer() {
 			utils.DErrorf("MiaoServer Launch | Cannot listen on unixsocket %s, error=%s", utils.GCFG.Binder, err.Error())
 			os.Exit(1)
 		}
-		server.Serve(unixListener)
+		err = server.Serve(unixListener)
+		if err != nil {
+			utils.DErrorf("MiaoServer Launch | Cannot serve on unixsocket %s, error=%s", utils.GCFG.Binder, err.Error())
+		}
 	} else {
 		netListener, err := net.Listen("tcp", utils.GCFG.Binder)
 		if err != nil {
@@ -215,9 +220,15 @@ func InitServer() {
 			os.Exit(1)
 		}
 		if utils.GCFG.MiaoKoSignedTLS {
-			server.ServeTLS(netListener, "", "")
+			err := server.ServeTLS(netListener, "", "")
+			if err != nil {
+				utils.DErrorf("MiaoServer Launch | Cannot serve on socket %s, error=%s", utils.GCFG.Binder, err.Error())
+			}
 		} else {
-			server.Serve(netListener)
+			err := server.Serve(netListener)
+			if err != nil {
+				utils.DErrorf("MiaoServer Launch | Cannot serve on socket %s, error=%s", utils.GCFG.Binder, err.Error())
+			}
 		}
 
 	}
@@ -225,6 +236,9 @@ func InitServer() {
 
 func CleanUpServer() {
 	if strings.HasPrefix(utils.GCFG.Binder, "/") {
-		os.Remove(utils.GCFG.Binder)
+		err := os.Remove(utils.GCFG.Binder)
+		if err != nil {
+			utils.DErrorf("MiaoServer CleanUp OS Error | Cannot remove unixsocket %s, error=%s", utils.GCFG.Binder, err.Error())
+		}
 	}
 }

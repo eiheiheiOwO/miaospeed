@@ -3,34 +3,34 @@ package taskpoll
 import (
 	"math/rand"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/airportr/miaospeed/utils"
 	"github.com/airportr/miaospeed/utils/structs"
 )
 
-type TaskPollExitCode uint
+type TPExitCode uint
 
 const (
-	TPExitSuccess TaskPollExitCode = iota
+	TPExitSuccess TPExitCode = iota
 	TPExitError
 	TPExitInterrupt
 )
 
 type taskPollItemWrapper struct {
 	TaskPollItem
-	counter int
-
+	counter  atomic.Int64
 	exitOnce sync.Once
 }
 
-func (tpw *taskPollItemWrapper) OnExit(exitCode TaskPollExitCode) {
+func (tpw *taskPollItemWrapper) OnExit(exitCode TPExitCode) {
 	tpw.exitOnce.Do(func() {
 		tpw.TaskPollItem.OnExit(exitCode)
 	})
 }
 
-type TaskPollController struct {
+type TPController struct {
 	name        string
 	concurrency uint
 	interval    time.Duration
@@ -39,20 +39,20 @@ type TaskPollController struct {
 	taskPoll    []*taskPollItemWrapper
 	runningTask map[string]int
 
-	current  uint
+	current  atomic.Uint32
 	pollLock sync.Mutex
 }
 
-func (tpc *TaskPollController) Name() string {
+func (tpc *TPController) Name() string {
 	return tpc.name
 }
 
 // single thread
-func (tpc *TaskPollController) populate() (int, *taskPollItemWrapper) {
-	tpc.pollLock.Lock()
+func (tpc *TPController) populate() (int, *taskPollItemWrapper) {
+	tpc.LockWithTimeit("populate")
 	defer tpc.pollLock.Unlock()
 
-	if tpc.current >= tpc.concurrency {
+	if tpc.current.Load() >= uint32(tpc.concurrency) {
 		return 0, nil
 	}
 
@@ -71,16 +71,16 @@ func (tpc *TaskPollController) populate() (int, *taskPollItemWrapper) {
 	for _, tp := range tpc.taskPoll {
 		factor -= int(tp.Weight())
 		if factor < 0 {
-			counter := tp.counter
+			counter := tp.counter.Load()
 
-			tp.counter += 1
-			if tp.counter >= tp.Count() {
-				tpc.remove_unsafe(tp.ID(), TPExitSuccess)
+			tp.counter.Add(1)
+			if tp.counter.Load() >= int64(tp.Count()) {
+				tpc.removeUnsafe(tp.ID(), TPExitSuccess)
 			}
 
-			tpc.current += 1
+			tpc.current.Add(1)
 			tpc.runningTask[tp.ID()] += 1
-			return counter, tp
+			return int(counter), tp
 		}
 	}
 
@@ -90,10 +90,9 @@ func (tpc *TaskPollController) populate() (int, *taskPollItemWrapper) {
 	return 0, nil
 }
 
-func (tpc *TaskPollController) release(tpw *taskPollItemWrapper) {
-	tpc.pollLock.Lock()
+func (tpc *TPController) release(tpw *taskPollItemWrapper) {
+	tpc.LockWithTimeit("release")
 	defer tpc.pollLock.Unlock()
-
 	tpc.runningTask[tpw.ID()] -= 1
 	inWaitList := structs.MapContains(tpc.taskPoll, func(w *taskPollItemWrapper) string {
 		return w.ID()
@@ -104,23 +103,36 @@ func (tpc *TaskPollController) release(tpw *taskPollItemWrapper) {
 		tpw.OnExit(TPExitSuccess)
 	}
 
-	if tpc.current > 0 {
-		tpc.current -= 1
+	if tpc.current.Load() > 0 {
+		// atomic
+		tpc.current.Add(^uint32(0))
 	}
 }
 
-func (tpc *TaskPollController) AwaitingCount() int {
-	tpc.pollLock.Lock()
+func (tpc *TPController) AwaitingCount() int {
+	tpc.LockWithTimeit("AwaitingCount")
+	//tpc.pollLock.Lock()
 	defer tpc.pollLock.Unlock()
 
 	totalCount := 0
 	for _, tp := range tpc.taskPoll {
-		totalCount += (tp.Count() - tp.counter)
+		totalCount += tp.Count() - int(tp.counter.Load())
 	}
+
 	return totalCount
 }
 
-func (tpc *TaskPollController) Start() {
+func (tpc *TPController) UnsafeAwaitingCount() int {
+	// 此用法不是并发安全的，仅用于获取模糊估计的等待数量，要获取精确数量请使用AwaitingCount
+	totalCount := 0
+	for _, tp := range tpc.taskPoll {
+		totalCount += tp.Count() - int(tp.counter.Load())
+	}
+
+	return totalCount
+}
+
+func (tpc *TPController) Start() {
 	sigTerm := utils.MakeSysChan()
 
 	for {
@@ -133,7 +145,7 @@ func (tpc *TaskPollController) Start() {
 				utils.DLogf("Task Poll | Task Populate, poll=%s type=%s id=%s index=%v", tpc.name, tpw.TaskName(), tpw.ID(), itemIdx)
 				go func() {
 					defer func() {
-						utils.WrapErrorPure("Task population err", recover())
+						_ = utils.WrapErrorPure("Task population err", recover())
 						tpc.release(tpw)
 					}()
 					tpw.Yield(itemIdx, tpc)
@@ -150,8 +162,9 @@ func (tpc *TaskPollController) Start() {
 	}
 }
 
-func (tpc *TaskPollController) Push(item TaskPollItem) TaskPollItem {
-	tpc.pollLock.Lock()
+func (tpc *TPController) Push(item TaskPollItem) TaskPollItem {
+	//tpc.pollLock.Lock()
+	tpc.LockWithTimeit("Push")
 	defer tpc.pollLock.Unlock()
 
 	tpc.taskPoll = append(tpc.taskPoll, &taskPollItemWrapper{
@@ -161,7 +174,7 @@ func (tpc *TaskPollController) Push(item TaskPollItem) TaskPollItem {
 	return item
 }
 
-func (tpc *TaskPollController) remove_unsafe(id string, exitCode TaskPollExitCode) {
+func (tpc *TPController) removeUnsafe(id string, exitCode TPExitCode) {
 	var tp *taskPollItemWrapper = nil
 	tpc.taskPoll = structs.Filter(tpc.taskPoll, func(w *taskPollItemWrapper) bool {
 		if w.ID() == id {
@@ -177,15 +190,25 @@ func (tpc *TaskPollController) remove_unsafe(id string, exitCode TaskPollExitCod
 	}
 }
 
-func (tpc *TaskPollController) Remove(id string, exitCode TaskPollExitCode) {
-	tpc.pollLock.Lock()
+func (tpc *TPController) Remove(id string, exitCode TPExitCode) {
+	//tpc.pollLock.Lock()
+	tpc.LockWithTimeit("Remove")
 	defer tpc.pollLock.Unlock()
 
-	tpc.remove_unsafe(id, exitCode)
+	tpc.removeUnsafe(id, exitCode)
 }
 
-func NewTaskPollController(name string, concurrency uint, interval time.Duration, emptyWait time.Duration) *TaskPollController {
-	return &TaskPollController{
+func (tpc *TPController) LockWithTimeit(funcname string) {
+	t1 := time.Now()
+	tpc.pollLock.Lock()
+	t2 := time.Since(t1)
+	if t2 > 1*time.Millisecond {
+		utils.DLogf("Task Poll | LockWithTimeit, timeused=%v, funcname=%s", t2, funcname)
+	}
+}
+
+func NewTaskPollController(name string, concurrency uint, interval time.Duration, emptyWait time.Duration) *TPController {
+	return &TPController{
 		name:        name,
 		concurrency: structs.WithInDefault(concurrency, 1, 64, 16),
 		interval:    interval,

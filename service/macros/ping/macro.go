@@ -13,6 +13,7 @@ type Ping struct {
 	RequestSD   float64
 	RTTList     []uint16
 	RequestList []uint16
+	StatusCodes []int
 }
 
 func (m *Ping) Type() interfaces.SlaveRequestMacroType {

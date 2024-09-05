@@ -2,6 +2,8 @@ package matrices
 
 import (
 	"github.com/airportr/miaospeed/interfaces"
+	"github.com/airportr/miaospeed/service/matrices/httpstatuscode"
+	"github.com/airportr/miaospeed/service/matrices/totalrttping"
 	"github.com/airportr/miaospeed/utils/structs"
 
 	"github.com/airportr/miaospeed/service/matrices/averagespeed"
@@ -50,17 +52,11 @@ var registeredList = map[interfaces.SlaveRequestMatrixType]func() interfaces.Sla
 	interfaces.MatrixMAXRTTPing: func() interfaces.SlaveRequestMatrix {
 		return &maxrttping.MaxRttPing{}
 	},
-	interfaces.MatrixSDRTT:  func() interfaces.SlaveRequestMatrix { return &sdrtt.SDRTT{} },
-	interfaces.MatrixSDHTTP: func() interfaces.SlaveRequestMatrix { return &sdhttp.SDHTTP{} },
-	//interfaces.MatrixMAXHTTPPing: func() interfaces.SlaveRequestMatrix {
-	//	return &maxrttping.MaxRttPing{}
-	//},
-	//interfaces.MatrixTotalRTTPing: func() interfaces.SlaveRequestMatrix {
-	//	return &scripttest.ScriptTest{}
-	//},
-	//interfaces.MatrixTotalHTTPPing: func() interfaces.SlaveRequestMatrix {
-	//	return &scripttest.ScriptTest{}
-	//},
+	interfaces.MatrixSDRTT:         func() interfaces.SlaveRequestMatrix { return &sdrtt.SDRTT{} },
+	interfaces.MatrixSDHTTP:        func() interfaces.SlaveRequestMatrix { return &sdhttp.SDHTTP{} },
+	interfaces.MatrixHTTPCode:      func() interfaces.SlaveRequestMatrix { return &httpstatuscode.HTTPStatusCode{} },
+	interfaces.MatrixTotalRTTPing:  func() interfaces.SlaveRequestMatrix { return &totalrttping.TotalRTT{} },
+	interfaces.MatrixTotalHTTPPing: func() interfaces.SlaveRequestMatrix { return &totalrttping.TotalHTTP{} },
 }
 
 func Find(matrixType interfaces.SlaveRequestMatrixType) interfaces.SlaveRequestMatrix {

@@ -22,6 +22,9 @@ type MaxRTTDS struct {
 	Value uint16
 }
 
+type HTTPStatusCodeDS struct {
+	Values []int
+}
 type MaxHTTPDS struct {
 	Value uint16
 }
@@ -40,11 +43,11 @@ type PerSecondSpeedDS struct {
 }
 
 type TotalRTTDS struct {
-	values []uint16
+	Values []uint16
 }
 
 type TotalHTTPDS struct {
-	values []uint16
+	Values []uint16
 }
 
 type UDPTypeDS struct {

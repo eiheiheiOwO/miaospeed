@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httptrace"
@@ -18,7 +20,37 @@ import (
 	"github.com/airportr/miaospeed/utils/structs"
 )
 
-func pingViaTrace(ctx context.Context, p interfaces.Vendor, url string) (uint16, uint16, error) {
+type timeoutReader struct {
+	r       *bufio.Reader
+	timeout time.Time
+}
+
+func (tr *timeoutReader) Read(p []byte) (n int, err error) {
+	if time.Now().After(tr.timeout) {
+		return 0, errors.New("read timeout")
+	}
+	return tr.r.Read(p)
+}
+func saferParseHTTPStatus(reader *bufio.Reader) (int, error) {
+	//reader := bufio.NewReader(bytes.NewReader(data))
+
+	// 设置一个5秒的超时
+	timeoutReader := &timeoutReader{reader, time.Now().Add(5 * time.Second)}
+
+	// 限制读取的数据量为1MB
+	limitedReader := io.LimitReader(timeoutReader, 1024*1024)
+
+	resp, err := http.ReadResponse(bufio.NewReader(limitedReader), nil)
+	if err != nil {
+		return 0, err
+	}
+	defer func() {
+		_ = resp.Body.Close()
+	}()
+
+	return resp.StatusCode, nil
+}
+func pingViaTrace(ctx context.Context, p interfaces.Vendor, url string) (uint16, uint16, int, error) {
 	transport := &http.Transport{
 		//Dial: func(string, string) (net.Conn, error) {
 		//	return p.DialTCP(ctx, url, interfaces.ROptionsTCP)
@@ -42,7 +74,7 @@ func pingViaTrace(ctx context.Context, p interfaces.Vendor, url string) (uint16,
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, 0, err
 	}
 
 	tlsStart := int64(0)
@@ -70,28 +102,30 @@ func pingViaTrace(ctx context.Context, p interfaces.Vendor, url string) (uint16,
 
 	connStart := time.Now().UnixMilli()
 	if resp, err := transport.RoundTrip(req); err != nil {
-		return 0, 0, err
+		return 0, 0, 0, err
 	} else {
 		defer resp.Body.Close()
 		connEnd := time.Now().UnixMilli()
 		utils.DBlackhole(!strings.HasPrefix(url, "https:"), connEnd-writeEnd, writeEnd-tlsEnd, tlsEnd-tlsStart, tlsStart-connStart)
 		if !strings.HasPrefix(url, "https:") {
-			return uint16(writeStart - connStart), uint16(writeEnd - connStart), nil
+			return uint16(writeStart - connStart), uint16(writeEnd - connStart), resp.StatusCode, nil
 		}
 		if resp.TLS != nil && resp.TLS.HandshakeComplete {
 			// use payload rtt
-			return uint16(writeEnd - tlsEnd), uint16(writeEnd - connStart), nil
+			return uint16(writeEnd - tlsEnd), uint16(writeEnd - connStart), resp.StatusCode, nil
+
 			// return uint16(tlsEnd - tlsStart), uint16(writeEnd - connStart), nil
 		}
-		// https rtt is also avalible
-		if writeEnd != 0 {
-			return 0, uint16(writeEnd - connStart), nil
-		}
-		return 0, 0, fmt.Errorf("cannot extract payload from response")
+		//// https rtt is also avalible
+		//if writeEnd != 0 {
+		//	return 0, uint16(writeEnd - connStart), nil
+		//}
+
+		return 0, 0, 0, fmt.Errorf("cannot extract payload from response")
 	}
 }
 
-func pingViaNetCat(ctx context.Context, p interfaces.Vendor, url string) (uint16, uint16, error) {
+func pingViaNetCat(ctx context.Context, p interfaces.Vendor, url string) (uint16, uint16, int, error) {
 	purl, _ := urllib.Parse(url)
 	data := purl.EscapedPath()
 	if purl.RawQuery != "" {
@@ -103,9 +137,11 @@ func pingViaNetCat(ctx context.Context, p interfaces.Vendor, url string) (uint16
 	connStart := time.Now()
 	conn, err := p.DialTCP(ctx, url, interfaces.ROptionsTCP)
 	if err != nil || conn == nil {
-		return 0, 0, fmt.Errorf("cannot dial remote address")
+		return 0, 0, 0, fmt.Errorf("cannot dial remote address")
 	}
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 
 	_ = conn.SetDeadline(time.Now().Add(time.Second * 6))
 	reader := bufio.NewReader(conn)
@@ -113,7 +149,7 @@ func pingViaNetCat(ctx context.Context, p interfaces.Vendor, url string) (uint16
 	// prewrite to ensure tcp conn is established
 	// httpStartReq1 := time.Now().UnixMilli()
 	if _, err := conn.Write([]byte(data)); err != nil {
-		return 0, 0, fmt.Errorf("cannot write payload to remote")
+		return 0, 0, 0, fmt.Errorf("cannot write payload to remote")
 	}
 	_, _ = reader.ReadByte()
 	rtt1 := time.Since(connStart).Milliseconds()
@@ -124,22 +160,27 @@ func pingViaNetCat(ctx context.Context, p interfaces.Vendor, url string) (uint16
 
 	httpStartReq2 := time.Now()
 	if _, err := conn.Write([]byte(data)); err != nil {
-		return 0, 0, fmt.Errorf("cannot write payload to remote")
+		return 0, 0, 0, fmt.Errorf("cannot write payload to remote")
 	}
-	_, _ = reader.ReadByte()
+	_, _ = reader.Peek(1)
 	//_, _, _ = reader.ReadLine()
 
 	rtt2 := time.Since(httpStartReq2).Milliseconds()
-	for reader.Buffered() > 0 {
-		_, _, _ = reader.ReadLine()
+	//for reader.Buffered() > 0 {
+	//	_, _, _ = reader.ReadLine()
+	//}
+	statusCode, err := saferParseHTTPStatus(reader)
+	if err != nil {
+		return uint16(rtt2), uint16(rtt1), 0, nil
 	}
 	utils.DBlackholef("http response time1: %d, %d", uint16(rtt2), uint16(rtt1))
-	return uint16(rtt2), uint16(rtt1), nil
+	return uint16(rtt2), uint16(rtt1), statusCode, nil
 }
 
 func ping(obj *Ping, p interfaces.Vendor, url string, withAvg uint16, timeout uint) {
 	var totalMS []uint16
 	var totalMSRTT []uint16
+	var statusCodes []int
 	if p == nil {
 		obj.RTT = 0
 		obj.Request = 0
@@ -156,16 +197,17 @@ func ping(obj *Ping, p interfaces.Vendor, url string, withAvg uint16, timeout ui
 
 	for len(totalMS) < int(withAvg) {
 		ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Millisecond)
-		delayRTT, delay := uint16(0), uint16(0)
+		delayRTT, delay, statusCode := uint16(0), uint16(0), 0
 		if strings.HasPrefix(url, "https:") {
-			delayRTT, delay, _ = pingViaTrace(ctx, p, url)
+			delayRTT, delay, statusCode, _ = pingViaTrace(ctx, p, url)
 		} else {
-			delayRTT, delay, _ = pingViaNetCat(ctx, p, url)
+			delayRTT, delay, statusCode, _ = pingViaNetCat(ctx, p, url)
 		}
 		obj.MaxRTT = structs.Max(obj.MaxRTT, delayRTT)
 		obj.MaxRequest = structs.Max(obj.MaxRequest, delay)
 		totalMSRTT = append(totalMSRTT, delayRTT)
 		totalMS = append(totalMS, delay)
+		statusCodes = append(statusCodes, statusCode)
 		cancel()
 	}
 
@@ -173,6 +215,7 @@ func ping(obj *Ping, p interfaces.Vendor, url string, withAvg uint16, timeout ui
 	obj.Request = calcAvgPing(totalMS)
 	obj.RTTList = totalMSRTT
 	obj.RequestList = totalMS
+	obj.StatusCodes = statusCodes
 	obj.RTTSD = calcStdDevPing(totalMSRTT)
 	obj.RequestSD = calcStdDevPing(totalMS)
 }
