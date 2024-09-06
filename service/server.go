@@ -126,18 +126,18 @@ func InitServer() {
 						return
 					}
 					poll = SpeedTaskPoll
+					awaitingCount := uint(poll.UnsafeAwaitingCount())
+					if awaitingCount > utils.GCFG.TaskLimit {
+						_ = conn.WriteJSON(&interfaces.SlaveResponse{
+							Error: fmt.Sprintf("too many tasks are waiting, please try later, current queuing=%d", awaitingCount),
+						})
+						return
+					}
 				} else {
 					poll = ConnTaskPoll
 				}
 
-				awaitingCount := uint(poll.UnsafeAwaitingCount())
-				if awaitingCount > utils.GCFG.TaskLimit {
-					_ = conn.WriteJSON(&interfaces.SlaveResponse{
-						Error: fmt.Sprintf("too many tasks are waiting, please try later, current queuing=%d", awaitingCount),
-					})
-					return
-				}
-				utils.DLogf("MiaoServer Test | Receive Task, name=%s poll=%s awaitingCount=%d", sr.Basics.ID, poll.Name(), awaitingCount)
+				utils.DLogf("MiaoServer Test | Receive Task, name=%s poll=%s", sr.Basics.ID, poll.Name())
 
 				// build testing item
 				item := poll.Push((&TestingPollItem{
@@ -190,7 +190,7 @@ func InitServer() {
 					ID:               item.ID(),
 					MiaoSpeedVersion: utils.VERSION,
 					Progress: &interfaces.SlaveProgress{
-						Queuing: poll.AwaitingCount(),
+						Queuing: poll.UnsafeAwaitingCount(),
 					},
 				})
 				batches.Set(item.ID(), true)
