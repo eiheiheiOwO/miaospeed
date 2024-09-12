@@ -12,7 +12,6 @@ import (
 	"github.com/airportr/miaospeed/interfaces"
 	"github.com/airportr/miaospeed/preconfigs"
 	"github.com/airportr/miaospeed/utils"
-	"github.com/airportr/miaospeed/utils/ipfilter"
 	"github.com/airportr/miaospeed/utils/structs"
 	"github.com/gorilla/websocket"
 
@@ -22,7 +21,7 @@ import (
 
 type WsHandler struct {
 	Serve    func(http.ResponseWriter, *http.Request)
-	IPFilter *ipfilter.IPFilter
+	IPFilter *structs.IPFilter
 }
 
 func (wh *WsHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
@@ -50,7 +49,7 @@ func InitServer() {
 
 	utils.DWarnf("MiaoSpeed Server | Start Listening, bind=%s", utils.GCFG.Binder)
 	wsHandler := WsHandler{
-		IPFilter: ipfilter.New(ipfilter.Options{
+		IPFilter: structs.New(structs.Options{
 			AllowedIPs:     utils.GCFG.AllowIPs,
 			BlockByDefault: true,
 		}),
