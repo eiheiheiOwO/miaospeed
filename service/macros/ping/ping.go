@@ -162,16 +162,19 @@ func pingViaNetCat(ctx context.Context, p interfaces.Vendor, url string) (uint16
 	if _, err := conn.Write([]byte(data)); err != nil {
 		return 0, 0, 0, fmt.Errorf("cannot write payload to remote")
 	}
-	_, _ = reader.Peek(1)
+	b1, rerr := reader.Peek(1)
+	if rerr != nil {
+		return 0, 0, 0, fmt.Errorf("cannot read payload from remote")
+	}
 	//_, _, _ = reader.ReadLine()
-
+	utils.DWarnf("a byte: %v", b1)
 	rtt2 := time.Since(httpStartReq2).Milliseconds()
 	//for reader.Buffered() > 0 {
 	//	_, _, _ = reader.ReadLine()
 	//}
 	statusCode, err := saferParseHTTPStatus(reader)
 	if err != nil {
-		return uint16(rtt2), uint16(rtt1), 0, nil
+		return uint16(rtt2), 0, 0, nil
 	}
 	utils.DBlackholef("http response time1: %d, %d", uint16(rtt2), uint16(rtt1))
 	return uint16(rtt2), uint16(rtt1), statusCode, nil

@@ -36,7 +36,7 @@ func (gc *GlobalConfig) SignRequest(req *interfaces.SlaveRequest) string {
 }
 
 func (gc *GlobalConfig) ValidateWSPath(path string) bool {
-	DLogf("Path to the websocket to be validated: %s, Predefined websocket path: %s\n", path, gc.Path)
+	DBlackholef("Path to the websocket to be validated: %s, Predefined websocket path: %s\n", path, gc.Path)
 	return path == gc.Path
 }
 
