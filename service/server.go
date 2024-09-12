@@ -12,12 +12,12 @@ import (
 	"github.com/airportr/miaospeed/interfaces"
 	"github.com/airportr/miaospeed/preconfigs"
 	"github.com/airportr/miaospeed/utils"
+	"github.com/airportr/miaospeed/utils/ipfilter"
 	"github.com/airportr/miaospeed/utils/structs"
 	"github.com/gorilla/websocket"
 
 	"github.com/airportr/miaospeed/service/matrices"
 	"github.com/airportr/miaospeed/service/taskpoll"
-	"github.com/jpillora/ipfilter"
 )
 
 type WsHandler struct {
