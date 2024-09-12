@@ -51,6 +51,7 @@ func InitServer() {
 			defer func() {
 				_ = conn.Close()
 			}()
+			utils.DLogf("MiaoServer | new unverified connection | remote=%s", r.RemoteAddr)
 			// Verify the websocket path
 			if !utils.GCFG.ValidateWSPath(r.URL.Path) {
 				_ = conn.WriteJSON(&interfaces.SlaveResponse{
@@ -69,14 +70,13 @@ func InitServer() {
 					}
 				}
 			}
-
 			defer cancel()
 			for {
 				sr := interfaces.SlaveRequest{}
-				_, r, err := conn.NextReader()
+				_, r2, err := conn.NextReader()
 				if err == nil {
 					// unsafe, ensure jsoniter package receives frequently security updates.
-					err = jsoniter.NewDecoder(r).Decode(&sr)
+					err = jsoniter.NewDecoder(r2).Decode(&sr)
 					// 原方案
 					//err = json.NewDecoder(r).Decode(&sr)
 					if err == io.EOF {
@@ -84,7 +84,6 @@ func InitServer() {
 						err = io.ErrUnexpectedEOF
 					}
 				}
-
 				if err != nil {
 					if !strings.Contains(err.Error(), "EOF") && !strings.Contains(err.Error(), "reset by peer") {
 						utils.DErrorf("MiaoServer Test | Task receiving error, error=%s", err.Error())
@@ -92,7 +91,7 @@ func InitServer() {
 					return
 				}
 				verified := utils.GCFG.VerifyRequest(&sr)
-				utils.DLogf("MiaoServer Test | Receive Task, name=%s invoker=%v matrices=%v payload=%d verify=%v", sr.Basics.ID, sr.Basics.Invoker, sr.Options.Matrices, len(sr.Nodes), verified)
+				utils.DLogf("MiaoServer Test | Receive Task, name=%s invoker=%v verify=%v remote=%s matrices=%v payload=%d", sr.Basics.ID, sr.Basics.Invoker, verified, r.RemoteAddr, sr.Options.Matrices, len(sr.Nodes))
 
 				// verify token
 				if !verified {
