@@ -118,17 +118,16 @@ func (tpc *TPController) AwaitingCount() int {
 	for _, tp := range tpc.taskPoll {
 		totalCount += tp.Count() - int(tp.counter.Load())
 	}
-
 	return totalCount
 }
 
 func (tpc *TPController) UnsafeAwaitingCount() int {
-	// 此用法不是并发安全的，仅用于获取模糊估计的等待数量，要获取精确数量请使用AwaitingCount
+	// This function is not concurrency safe and is only used to get a vague estimate of the number of waits
+	// to get the exact number use AwaitingCount
 	totalCount := 0
 	for _, tp := range tpc.taskPoll {
 		totalCount += tp.Count() - int(tp.counter.Load())
 	}
-
 	return totalCount
 }
 
@@ -199,12 +198,12 @@ func (tpc *TPController) Remove(id string, exitCode TPExitCode) {
 }
 
 func (tpc *TPController) LockWithTimeit(funcname string) {
-	t1 := time.Now()
+	//t1 := time.Now()
 	tpc.pollLock.Lock()
-	t2 := time.Since(t1)
-	if t2 > 1*time.Millisecond {
-		utils.DLogf("Task Poll | LockWithTimeit, timeused=%v, funcname=%s", t2, funcname)
-	}
+	//t2 := time.Since(t1)
+	//if t2 > 1*time.Millisecond {
+	//	utils.DBlackholef("Task Poll | LockWithTimeit, timeused=%v, funcname=%s", t2, funcname)
+	//}
 }
 
 func NewTaskPollController(name string, concurrency uint, interval time.Duration, emptyWait time.Duration) *TPController {

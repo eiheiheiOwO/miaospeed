@@ -24,6 +24,7 @@ func InitConfigServer() *utils.GlobalConfig {
 	sflag.BoolVar(&gcfg.NoSpeedFlag, "nospeed", false, "decline all speedtest requests")
 	sflag.StringVar(&gcfg.MaxmindDB, "mmdb", "", "reroute all geoip query to local mmdbs. for example: test.mmdb,testcity.mmdb")
 	path := sflag.String("path", "", "specific websocket path you want, default '/'")
+	allowIP := sflag.String("allowip", "0.0.0.0/0", "allow ip range, can be format like 192.168.1.0/24,10.12.13.2")
 	whiteList := sflag.String("whitelist", "", "bot id whitelist, can be format like 1111,2222,3333")
 	pubKeyStr := sflag.String("serverpublickey", "", "specific the sever public key (PEM format)")
 	privKeyStr := sflag.String("serverprivatekey", "", "specific the sever private key (PEM format)")
@@ -32,6 +33,9 @@ func InitConfigServer() *utils.GlobalConfig {
 	gcfg.WhiteList = make([]string, 0)
 	if *whiteList != "" {
 		gcfg.WhiteList = strings.Split(*whiteList, ",")
+	}
+	if *allowIP != "" {
+		gcfg.AllowIPs = strings.Split(*allowIP, ",")
 	}
 	if *path != "" {
 		if *path == "/" {

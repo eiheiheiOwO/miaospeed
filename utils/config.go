@@ -9,6 +9,7 @@ type GlobalConfig struct {
 	Token            string
 	Binder           string
 	WhiteList        []string
+	AllowIPs         []string
 	SpeedLimit       uint64
 	TaskLimit        uint
 	PauseSecond      uint

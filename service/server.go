@@ -17,13 +17,21 @@ import (
 
 	"github.com/airportr/miaospeed/service/matrices"
 	"github.com/airportr/miaospeed/service/taskpoll"
+	"github.com/jpillora/ipfilter"
 )
 
 type WsHandler struct {
-	Serve func(http.ResponseWriter, *http.Request)
+	Serve    func(http.ResponseWriter, *http.Request)
+	IPFilter *ipfilter.IPFilter
 }
 
 func (wh *WsHandler) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	ip, _, _ := net.SplitHostPort(r.RemoteAddr)
+	//show simple forbidden text
+	if !wh.IPFilter.Allowed(ip) {
+		http.Error(rw, http.StatusText(http.StatusForbidden), http.StatusForbidden)
+		return
+	}
 	if wh.Serve != nil {
 		wh.Serve(rw, r)
 	}
@@ -42,6 +50,10 @@ func InitServer() {
 
 	utils.DWarnf("MiaoSpeed Server | Start Listening, bind=%s", utils.GCFG.Binder)
 	wsHandler := WsHandler{
+		IPFilter: ipfilter.New(ipfilter.Options{
+			AllowedIPs:     utils.GCFG.AllowIPs,
+			BlockByDefault: true,
+		}),
 		Serve: func(rw http.ResponseWriter, r *http.Request) {
 			conn, err := upgrader.Upgrade(rw, r, nil)
 			if err != nil {

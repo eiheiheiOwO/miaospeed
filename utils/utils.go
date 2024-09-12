@@ -3,7 +3,9 @@ package utils
 import (
 	"github.com/gofrs/uuid"
 	jsoniter "github.com/json-iterator/go"
+	"net"
 	"os"
+	"strings"
 )
 
 func RandomUUID() string {
@@ -26,4 +28,20 @@ func ReadFile(path string) string {
 		return ""
 	}
 	return string(file)
+}
+
+func parseIPAddress(input string) (string, error) {
+	input = strings.Trim(input, "[]")
+
+	host, _, err := net.SplitHostPort(input)
+	if err != nil {
+		host = input
+	}
+
+	ip := net.ParseIP(host)
+	if ip == nil {
+		return "", net.InvalidAddrError("invalid IP address")
+	}
+
+	return ip.String(), nil
 }

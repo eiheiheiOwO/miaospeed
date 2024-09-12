@@ -64,6 +64,10 @@ func (tpi *TestingPollItem) Yield(idx int, tpc *taskpoll.TPController) {
 		tpi.results.Push(result)
 		tpi.onProcessLock.Lock()
 		defer tpi.onProcessLock.Unlock()
+		if tpc.Name() == "ConnPoll" && idx%4 != 0 {
+			return
+		}
+		//utils.DWarnf("Task yield idx %d, tpc: %s", idx, tpc.Name())
 		tpi.onProcess(tpi, idx, result)
 	}()
 

@@ -1,3 +1,4 @@
-miaospeed v4.5.1
+miaospeed v4.5.2
 
-1. tasklimit 启动参数仅对测速队列生效
+1. 新的启动参数： allowip , 允许访问的IP地址，多个IP用逗号分隔，支持ip段。
+2. 优化内部任务调度，减少锁的竞争。
