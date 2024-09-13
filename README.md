@@ -57,7 +57,7 @@
 ## 主要客户端实现
 
 * miaoko (闭源) 项目地址：无
-* koipy (闭源) 项目地址：https://koipy.gitbook.io/koipy
+* koipy (初版开源，后续闭源) [项目地址](https://github.com/koipy-org/koipy) [项目文档](https://koipy.gitbook.io/koipy)
 
 ## 版权与协议
 
