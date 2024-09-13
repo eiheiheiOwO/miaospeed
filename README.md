@@ -2,11 +2,16 @@
 
 ---
 
-> miaospeed 于 4.0.0 与 miaoko 分离，正式成为独立的开源项目。一般来说，miaospeed 依然被认为是 miaoko 的专用后端，但也能成为一个通用型后端。
+> miaospeed 网络测试工具
 
-## 兼容性
+## 特性
 
-此分支兼容FullTClash对接，同时无感保留与原版miaoko的对接
+- 全平台支持，支持 Windows、Linux、MacOS 等主流操作系统。
+- websocket 服务，支持多客户端同时测试。
+- 支持主流出站代理Shadowsocks,Vmess,VLESS,Trojan,Hysteria2等
+- 丰富的测试参数配置，支持自定义请求体、超时时间、并发数等
+- 自定义javascript脚本支持，支持自定义测试逻辑
+
 
 ## 基本使用方式
 
@@ -40,13 +45,19 @@
 
 ### 对接方法
 
-由于 _miaoko_ 是闭源软件/服务，如果您想在其他服务内对接 miaospeed，可能没有现成的案例。但是，您依然可以参考如下思路:
+如果您想在其他服务内对接 miaospeed，可能没有现成的案例。但是，您依然可以参考如下思路:
 
 0. miaospeed 对接本质是通过 ws 通道发送指令、传递信息。一般来说，您只需要连接 ws，构建请求结构体，签名请求，接收结果即可。
 1. 连接 ws，这一步很简单，也就不用赘述了。（如果您在客户端强制断开链接，则任务会被自动中止）
 2. 构建请求结构体，参考: https://github.com/miaokobot/miaospeed/blob/fd7abecc2d36a0f18b08f048f9a53b7c0a26bd9e/interfaces/api_request.go#L50
 3. 签名，参考: https://github.com/miaokobot/miaospeed/blob/df6202409e87c5d944ab756608fd31d35390b5c0/utils/challenge.go#L39 其中需要传入两个参数。第一个参数是 `启动TOKEN` （即您启动 miaospeed 时传入的 -token 后的内容），第二个就是在第二步中您构建的结构体 `req`。签名的方法，通俗一些说明就是将结构体转换为 JSON String 然后与 `启动TOKEN` 和 `编译TOKEN` 切片分别累积做 SHA512 HASH。最后，将签名的字符串写入 `req.Challenge` 即可。
 4. 发送完成签名后的请求，您就可以接收返回值了。服务器返回的结构体统一为 https://github.com/miaokobot/miaospeed/blob/fd7abecc2d36a0f18b08f048f9a53b7c0a26bd9e/interfaces/api_response.go#L28
+
+
+## 主要客户端实现
+
+* miaoko (闭源) 项目地址：无
+* koipy (闭源) 项目地址：https://koipy.gitbook.io/koipy
 
 ## 版权与协议
 
