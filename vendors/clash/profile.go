@@ -5,9 +5,19 @@ import (
 	"github.com/airportr/miaospeed/utils"
 	"github.com/metacubex/mihomo/adapter"
 	"github.com/metacubex/mihomo/constant"
+	vendorlog "github.com/sirupsen/logrus"
 	"gopkg.in/yaml.v2"
 )
 
+func init() {
+	patch()
+}
+
+// patch is used to fix the logger exit function
+func patch() {
+	logger := vendorlog.StandardLogger()
+	logger.ExitFunc = func(code int) {}
+}
 func parseProxy(proxyName, proxyPayload string) constant.Proxy {
 	var payload map[string]any
 	yaml.Unmarshal([]byte(proxyPayload), &payload)
