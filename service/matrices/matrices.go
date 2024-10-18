@@ -7,6 +7,7 @@ import (
 	"github.com/airportr/miaospeed/utils/structs"
 
 	"github.com/airportr/miaospeed/service/matrices/averagespeed"
+	"github.com/airportr/miaospeed/service/matrices/debug"
 	"github.com/airportr/miaospeed/service/matrices/httpping"
 	"github.com/airportr/miaospeed/service/matrices/inboundgeoip"
 	"github.com/airportr/miaospeed/service/matrices/invalid"
@@ -57,6 +58,7 @@ var registeredList = map[interfaces.SlaveRequestMatrixType]func() interfaces.Sla
 	interfaces.MatrixHTTPCode:      func() interfaces.SlaveRequestMatrix { return &httpstatuscode.HTTPStatusCode{} },
 	interfaces.MatrixTotalRTTPing:  func() interfaces.SlaveRequestMatrix { return &totalrttping.TotalRTT{} },
 	interfaces.MatrixTotalHTTPPing: func() interfaces.SlaveRequestMatrix { return &totalrttping.TotalHTTP{} },
+	interfaces.MatrixSleep:         func() interfaces.SlaveRequestMatrix { return &debug.SleepDS{} },
 }
 
 func Find(matrixType interfaces.SlaveRequestMatrixType) interfaces.SlaveRequestMatrix {

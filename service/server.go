@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	jsoniter "github.com/json-iterator/go"
 	"io"
 	"net"
@@ -129,7 +128,7 @@ func InitServer() {
 				macros := ExtractMacrosFromMatrices(mtrx)
 
 				// select poll
-				if structs.Contains(macros, interfaces.MacroSpeed) {
+				if structs.Contains(macros, interfaces.MacroSpeed) || structs.Contains(macros, interfaces.MacroSleep) {
 					if utils.GCFG.NoSpeedFlag {
 						_ = conn.WriteJSON(&interfaces.SlaveResponse{
 							Error: "speedtest is disabled on backend",
@@ -137,13 +136,13 @@ func InitServer() {
 						return
 					}
 					poll = SpeedTaskPoll
-					awaitingCount := uint(poll.UnsafeAwaitingCount())
-					if awaitingCount > utils.GCFG.TaskLimit {
-						_ = conn.WriteJSON(&interfaces.SlaveResponse{
-							Error: fmt.Sprintf("too many tasks are waiting, please try later, current queuing=%d", awaitingCount),
-						})
-						return
-					}
+					//awaitingCount := uint(poll.AwaitingCount())
+					//if awaitingCount > utils.GCFG.TaskLimit {
+					//	_ = conn.WriteJSON(&interfaces.SlaveResponse{
+					//		Error: fmt.Sprintf("too many tasks are waiting, please try later, current queuing=%d", awaitingCount),
+					//	})
+					//	return
+					//}
 				} else {
 					poll = ConnTaskPoll
 				}
@@ -182,28 +181,19 @@ func InitServer() {
 					// 计算权重
 					calcWeight: func(self *TestingPollItem) uint {
 						return 1
-						//if poll.Name() == "SpeedPoll" {
-						//	nodeNum := len(self.request.Nodes)
-						//	w := nodeNum / 10
-						//	if w == 0 {
-						//		return 1
-						//	} else {
-						//		return uint(w)
-						//	}
-						//} else {
-						//	return 1
-						//}
 					},
 				}).Init())
 
 				// onstart
-				_ = conn.WriteJSON(&interfaces.SlaveResponse{
-					ID:               item.ID(),
-					MiaoSpeedVersion: utils.VERSION,
-					Progress: &interfaces.SlaveProgress{
-						Queuing: poll.UnsafeAwaitingCount(),
-					},
-				})
+				if sr.Configs.ApiVersion == 2 {
+					_ = conn.WriteJSON(&interfaces.SlaveResponse{
+						ID:               item.ID(),
+						MiaoSpeedVersion: utils.VERSION,
+						Progress: &interfaces.SlaveProgress{
+							Queuing: poll.UnsafeAwaitingCount(),
+						},
+					})
+				}
 				batches.Set(item.ID(), true)
 			}
 		},

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/airportr/miaospeed/utils"
 	"net"
+	"strings"
 
 	"github.com/airportr/miaospeed/interfaces"
 	"github.com/metacubex/mihomo/component/resolver"
@@ -52,10 +53,10 @@ func (c *Clash) DialTCP(ctx context.Context, url string, network interfaces.Requ
 
 	addr, err := urlToMetadata(url, constant.TCP)
 	if err != nil {
-		return nil, fmt.Errorf("cannot build tcp context")
+		return nil, fmt.Errorf("cannot build tcp context: %v", err)
 	}
 	conn, err := c.proxy.DialContext(ctx, &addr)
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "timeout") && !strings.Contains(err.Error(), "no such host") {
 		utils.DLogf("cannot dialTCP: %s | proxy=%s | vendor=Clash | err=%s", url, c.proxy.Name(), err.Error())
 	}
 	return conn, err
@@ -71,7 +72,7 @@ func (c *Clash) DialUDP(ctx context.Context, url string) (net.PacketConn, error)
 		return nil, fmt.Errorf("cannot build udp context")
 	}
 	conn, err := c.proxy.DialUDP(&addr)
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "timeout") && !strings.Contains(err.Error(), "no such host") {
 		utils.DLogf("cannot dialUDP: %s | proxy=%s | vendor=Clash | err=%s", url, c.proxy.Name(), err.Error())
 	}
 	return conn, err

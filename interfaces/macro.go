@@ -5,11 +5,11 @@ type SlaveRequestMacroType string
 const (
 	MacroSpeed SlaveRequestMacroType = "SPEED"
 
-	MacroPing   SlaveRequestMacroType = "PING"
-	MacroUDP    SlaveRequestMacroType = "UDP"
-	MacroScript SlaveRequestMacroType = "SCRIPT"
-	MacroGeo    SlaveRequestMacroType = "GEO"
-
+	MacroPing    SlaveRequestMacroType = "PING"
+	MacroUDP     SlaveRequestMacroType = "UDP"
+	MacroScript  SlaveRequestMacroType = "SCRIPT"
+	MacroGeo     SlaveRequestMacroType = "GEO"
+	MacroSleep   SlaveRequestMacroType = "SLEEP"
 	MacroInvalid SlaveRequestMacroType = "INVALID"
 )
 

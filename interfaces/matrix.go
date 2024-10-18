@@ -22,6 +22,7 @@ const (
 	MatrixSDRTT         SlaveRequestMatrixType = "TEST_PING_SD_RTT"
 	MatrixSDHTTP        SlaveRequestMatrixType = "TEST_PING_SD_CONN"
 	MatrixHTTPCode      SlaveRequestMatrixType = "TEST_HTTP_CODE"
+	MatrixSleep         SlaveRequestMatrixType = "DEBUG_SLEEP"
 	MatrixInvalid       SlaveRequestMatrixType = "INVALID"
 )
 

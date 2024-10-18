@@ -5,12 +5,12 @@ import (
 	"github.com/airportr/miaospeed/utils/structs"
 
 	"github.com/airportr/miaospeed/service/macros/geo"
+	"github.com/airportr/miaospeed/service/macros/invalid"
 	"github.com/airportr/miaospeed/service/macros/ping"
 	"github.com/airportr/miaospeed/service/macros/script"
+	"github.com/airportr/miaospeed/service/macros/sleep"
 	"github.com/airportr/miaospeed/service/macros/speed"
 	"github.com/airportr/miaospeed/service/macros/udp"
-
-	"github.com/airportr/miaospeed/service/macros/invalid"
 )
 
 var registeredList = map[interfaces.SlaveRequestMacroType]func() interfaces.SlaveRequestMacro{
@@ -26,9 +26,8 @@ var registeredList = map[interfaces.SlaveRequestMacroType]func() interfaces.Slav
 	interfaces.MacroGeo: func() interfaces.SlaveRequestMacro {
 		return &geo.Geo{}
 	},
-	interfaces.MacroScript: func() interfaces.SlaveRequestMacro {
-		return &script.Script{}
-	},
+	interfaces.MacroScript: func() interfaces.SlaveRequestMacro { return &script.Script{} },
+	interfaces.MacroSleep:  func() interfaces.SlaveRequestMacro { return &sleep.Sleep{} },
 }
 
 func Find(macroType interfaces.SlaveRequestMacroType) interfaces.SlaveRequestMacro {
