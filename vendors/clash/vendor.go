@@ -4,11 +4,12 @@ import (
 	"context"
 	"fmt"
 	"github.com/airportr/miaospeed/utils"
+	"github.com/metacubex/mihomo/component/resolver"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/airportr/miaospeed/interfaces"
-	"github.com/metacubex/mihomo/component/resolver"
 	"github.com/metacubex/mihomo/constant"
 )
 
@@ -67,16 +68,35 @@ func (c *Clash) DialUDP(ctx context.Context, url string) (net.PacketConn, error)
 		return nil, fmt.Errorf("should call Build() before run")
 	}
 
-	addr, err := urlToMetadata(url, constant.UDP)
-	if err != nil {
-		return nil, fmt.Errorf("cannot build udp context")
-	}
-	conn, err := c.proxy.DialUDP(&addr)
-	if err != nil && !strings.Contains(err.Error(), "timeout") && !strings.Contains(err.Error(), "no such host") {
-		utils.DLogf("cannot dialUDP: %s | proxy=%s | vendor=Clash | err=%s", url, c.proxy.Name(), err.Error())
-	}
-	return conn, err
+	timeoutCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
 
+	type result struct {
+		conn net.PacketConn
+		err  error
+	}
+	ch := make(chan result, 1)
+
+	go func() {
+		addr, err := urlToMetadata(url, constant.UDP)
+		if err != nil {
+			ch <- result{nil, fmt.Errorf("cannot build udp context: %w", err)}
+			return
+		}
+
+		conn, err := c.proxy.ListenPacketContext(timeoutCtx, &addr)
+		if err != nil && !strings.Contains(err.Error(), "timeout") && !strings.Contains(err.Error(), "no such host") {
+			utils.DLogf("cannot dialUDP: %s | proxy=%s | vendor=Clash | err=%s", url, c.proxy.Name(), err.Error())
+		}
+		ch <- result{conn, err}
+	}()
+
+	select {
+	case res := <-ch:
+		return res.conn, res.err
+	case <-timeoutCtx.Done():
+		return nil, fmt.Errorf("dialUDP timeout after 5 seconds: %w", timeoutCtx.Err())
+	}
 }
 func (c *Clash) ProxyInfo() interfaces.ProxyInfo {
 	if c == nil || c.proxy == nil {
