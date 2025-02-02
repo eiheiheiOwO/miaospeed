@@ -1,5 +1,5 @@
 function get_ip_by_cf() {
-	const urls = ["https://1.1.1.1/cdn-cgi/trace", "https://[2606:4700:4700::1111]/cdn-cgi/trace"];
+	const urls = ["https://ipv4.ip.sb/cdn-cgi/trace", "https://ipv6.ip.sb/cdn-cgi/trace"];
 	const ipret = [];
 	urls.forEach((url) => {
 		const cf_content = (get(fetch(url, {
